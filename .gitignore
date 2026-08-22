@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+bin/
+build/
+dist/
+tmp/
+vendor/
+harness/evidence/*
+!harness/evidence/README.md
+

@@ -1,0 +1,28 @@
+version: "0.1"
+owner: "Zhu3xx"
+repository_role: "server-relay"
+contract_profile: "integration-profile.pending"
+paths:
+  contracts: "harness/契约"
+  fixtures: "harness/fixtures"
+  mocks: "harness/mocks"
+  scenarios: "harness/scenarios"
+  evidence: "harness/evidence"
+  scripts: "harness/scripts"
+rules:
+  production_code: false
+  real_business_data: false
+  decrypt_business_payload: false
+  offline_business_queue: false
+  relay_ack_is_commit: false
+required_scenarios:
+  - pairing_expired_or_replayed
+  - primary_connector_only
+  - revocation
+  - ack_vs_connector_receipt
+  - connector_offline_no_queue
+  - envelope_replay_tamper_expiry
+  - rate_limit_and_size
+  - relay_restart
+  - relay_cannot_decrypt
+
