@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C2 决策点学习文档 · Relay 脱敏审计元数据的 30 天保留</title>
+<style>
+  :root {
+    --ink: #1a1a2e; --grey: #6b7280; --blue: #2563eb; --green: #059669;
+    --amber: #d97706; --red: #dc2626; --bg: #f8fafc; --card: #ffffff;
+    --line: #e5e7eb;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    line-height: 1.85; font-size: 16px;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 48px 28px 96px; }
+  header.book {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #0ea5e9 100%);
+    color: #fff; border-radius: 18px; padding: 42px 40px; margin-bottom: 36px;
+  }
+  header.book .tag { font-size: 13px; letter-spacing: 2px; opacity: .8; text-transform: uppercase; }
+  header.book h1 { margin: 10px 0 12px; font-size: 30px; line-height: 1.4; }
+  header.book p  { margin: 0; opacity: .92; font-size: 15px; }
+  nav.toc {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 24px 32px; margin-bottom: 44px;
+  }
+  nav.toc h2 { margin: 0 0 12px; font-size: 17px; color: var(--blue); }
+  nav.toc ol { margin: 0; padding-left: 22px; }
+  nav.toc li { margin: 5px 0; font-size: 15px; }
+  nav.toc a { color: var(--ink); text-decoration: none; border-bottom: 1px dashed var(--line); }
+  nav.toc a:hover { color: var(--blue); }
+  section.chapter {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 36px 40px; margin-bottom: 36px;
+  }
+  section.chapter > h2 {
+    font-size: 23px; margin: 0 0 6px; padding-bottom: 12px;
+    border-bottom: 3px solid var(--blue); display: inline-block;
+  }
+  .chapter-guide {
+    background: #eff6ff; border-left: 4px solid var(--blue); border-radius: 0 10px 10px 0;
+    padding: 14px 20px; margin: 18px 0 26px; font-size: 14.5px; color: #1e40af;
+  }
+  .chapter-guide b { display: block; margin-bottom: 4px; }
+  h3 { font-size: 18.5px; margin: 34px 0 10px; color: var(--ink); }
+  h4 { font-size: 16px; margin: 24px 0 8px; color: var(--blue); }
+  figure { margin: 26px 0; text-align: center; }
+  figure img { max-width: 100%; border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 4px 18px rgba(0,0,0,.06); }
+  figcaption { font-size: 13.5px; color: var(--grey); margin-top: 10px; }
+  table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14.5px; }
+  th, td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+  th { background: #f1f5f9; font-weight: 700; white-space: nowrap; }
+  tr:nth-child(even) td { background: #fafbfc; }
+  .lens { border-radius: 10px; padding: 16px 20px; margin: 14px 0; font-size: 15px; }
+  .lens .lens-title { font-weight: 700; margin-bottom: 6px; font-size: 14px; letter-spacing: 1px; }
+  .lens.pro  { background: #f0fdf4; border-left: 4px solid var(--green); }
+  .lens.easy { background: #fffbeb; border-left: 4px solid var(--amber); }
+  .lens.story{ background: #fdf4ff; border-left: 4px solid #a855f7; }
+  .candour { border-radius: 10px; padding: 14px 20px; margin: 16px 0; font-size: 14.5px; background: #fff7ed; border: 1px dashed var(--amber); }
+  .candour.risk { background: #fef2f2; border-color: var(--red); }
+  .candour b { color: var(--amber); }
+  .candour.risk b { color: var(--red); }
+  .field-card {
+    border: 1px solid var(--line); border-radius: 12px; padding: 18px 22px; margin: 16px 0;
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+  }
+  .field-card h4 { margin-top: 0; color: var(--ink); }
+  code {
+    background: #eef2ff; color: #3730a3; padding: 1px 7px; border-radius: 6px;
+    font-family: "SF Mono", Menlo, monospace; font-size: 13.5px;
+  }
+  .verdict {
+    background: linear-gradient(135deg, #ecfdf5, #f0fdf4); border: 2px solid var(--green);
+    border-radius: 14px; padding: 24px 28px; margin: 24px 0;
+  }
+  .verdict h3 { margin-top: 0; color: var(--green); }
+  .good { color: var(--green); font-weight: 600; }
+  .bad  { color: var(--red); font-weight: 600; }
+  ul.tight li { margin: 6px 0; }
+  footer { text-align: center; color: var(--grey); font-size: 13px; margin-top: 40px; }
+  .src { font-size: 13.5px; color: var(--grey); }
+  .src a { color: var(--blue); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="book">
+  <div class="tag">NEW-Utell · 技术栈学习理解文档库 · 需求问答 C2</div>
+  <h1>Relay 脱敏审计元数据「最长保留 30 天」——这个决策到底在决定什么？</h1>
+  <p>对应 PRD：FR-008 Relay 服务 · 7.2 Relay 保留规则 · 9.2 发布验收清单（隐私合规）｜需求确认台账条目：C2（待确认）</p>
+</header>
+
+<nav class="toc">
+  <h2>目录</h2>
+  <ol>
+    <li><a href="#ch1">第一章 · 先看清战场：C2 决策点在 Utell 链路里的位置</a></li>
+    <li><a href="#ch2">第二章 · 主角登场：什么是「脱敏审计元数据」——五个字段逐个拆</a></li>
+    <li><a href="#ch3">第三章 · 保留期限的学问：为什么期限本身是个独立问题</a></li>
+    <li><a href="#ch4">第四章 · 四个选项正面对决：30 天 / 7 天 / 90 天 / 不保留</a></li>
+    <li><a href="#ch5">第五章 · 全书回顾与值得深挖的方向</a></li>
+  </ol>
+</nav>
+
+<!-- ==================== 第一章 ==================== -->
+<section class="chapter" id="ch1">
+  <h2>第一章 · 先看清战场：C2 决策点在 Utell 链路里的位置</h2>
+  <div class="chapter-guide">
+    <b>本章导览</b>
+    在讨论「留 30 天还是 7 天」之前，必须先搞懂两件事：Relay 这台服务器在整条链路里扮演什么角色？它为什么会需要「留一点痕迹」？本章把链路结构立起来，后面所有章节都挂在这张图上。
+  </div>
+
+  <h3>1.1 这个决策的根本张力</h3>
+  <p>Utell 的隐私架构有一条铁律（PRD 7.3）：<strong>业务内容端到端加密，Relay 服务器永远读不到用户写了什么</strong>。但 Relay 作为消息的中转站，又必须回答一个工程上绕不开的问题——<strong>当用户抱怨「我发的日志没同步到电脑」时，工程师拿什么去查？</strong></p>
+  <p>答案就是「审计元数据」：Relay 不记内容，但记「信封外面能看到的东西」。C2 这个决策点要回答的是：<strong>这些痕迹留多久？</strong>PRD 7.2 的草案写的是「最长保留 30 天，待确认」，C2 就是要你把这个「待确认」变成「已确认」。</p>
+
+  <figure>
+    <img src="assets/fig1-architecture.png" alt="Utell 链路结构图：Relay 的视野">
+    <figcaption>图 1 · Utell 三段式链路。明文只存在于两个端点；Relay 是「戴着眼罩的邮递员」，只能看信封。黄框里就是 C2 讨论的全部对象。</figcaption>
+  </figure>
+
+  <div class="lens pro">
+    <div class="lens-title">🔧 专业视角</div>
+    Relay 在整个架构中的角色是「身份与安全路由面」（见《架构基线》）：它负责配对认证、公钥登记、密文路由、ACK、重连与限流，<strong>不建立离线业务队列、不保存可解密业务正文</strong>（PRD 7.2、AC-019）。它允许落盘的只有一类东西——7.2 列出的五个脱敏审计字段。C2 决策的本质，是为这五个字段设定 <em>retention period（保留期限）</em> 与 <em>自动清除机制</em>。
+  </div>
+  <div class="lens easy">
+    <div class="lens-title">🌱 小白视角</div>
+    把 Utell 想象成「手机写日记 → 通过快递寄到家里的电脑」。快递单（Relay）上必须写收件信息才能投递，但出于隐私，日记本本身是锁在密码箱里的，快递员打不开。问题是：如果日记寄丢了，你打电话给快递公司投诉，快递公司得能查到「几号那天有没有收过你的件、送到没有」——查这个靠的就是快递底单。C2 决定的是：<strong>这些底单保留多久就烧掉？</strong>
+  </div>
+  <div class="lens story">
+    <div class="lens-story lens-title" style="font-weight:700">🏨 生动例子：酒店前台的访客登记本</div>
+    酒店前台的登记本记着「几点、哪个房间、访客几人」——不记你们在房间里聊了什么。登记本的存在让酒店能处理「我的访客说他来过但被拦了」这类投诉。但如果这本登记本<strong>永远保留</strong>，它本身就变成了隐私风险（谁翻过登记本，就知道你的社交关系网）。所以正经酒店会定期销毁旧登记页。C2 就是在给 Relay 的「登记本」定销毁周期。
+  </div>
+
+  <h3>1.2 为什么 Relay 不能「什么都不记」？</h3>
+  <p>三个刚性需求决定了审计元数据必须存在（区别只在留多久）：</p>
+  <ul class="tight">
+    <li><strong>排障</strong>：路由失败、限流误伤、认证抖动这类问题，没有历史记录就无法复盘「当时发生了什么」。PRD 8.1 把「可观测性」列为 P0 非功能要求。</li>
+    <li><strong>安全事件响应</strong>：如果某个 pairing 被盗用、出现重放攻击迹象，审计记录是确认攻击面与时间线的唯一依据（呼应《安全隐私与数据留存规范》中「保留最小取证信息」的要求）。</li>
+    <li><strong>合规自证</strong>：PRD 9.2 发布验收要求「脱敏日志检查」——你要能向检查者证明「我们确实只记了脱敏字段、确实到期删除了」，这本身需要审计机制存在。</li>
+  </ul>
+</section>
+
+<!-- ==================== 第二章 ==================== -->
+<section class="chapter" id="ch2">
+  <h2>第二章 · 主角登场：什么是「脱敏审计元数据」——五个字段逐个拆</h2>
+  <div class="chapter-guide">
+    <b>本章导览</b>
+    上一章立起了链路结构，知道了 Relay 是「戴眼罩的邮递员」。这一章拆开邮递员的登记本：PRD 7.2 允许 Relay 保存的五个字段，每一个为什么要这样设计、它泄露了什么、又守住了什么。读完你应该能回答：为什么这五样加起来仍然「脱敏」？
+  </div>
+
+  <p>先立两个贯穿全章的概念（后文不再重复解释）：</p>
+  <ul class="tight">
+    <li><strong>元数据（metadata）</strong>：关于数据的数据——不是内容本身，而是「谁、何时、多大、结果如何」这类外围事实。 analogy：信的内容是数据，信封上的邮戳和重量是元数据。</li>
+    <li><strong>脱敏（de-identification）</strong>：把能直接指认到人或还原出内容的信息，变换成指认不了、还原不了的形式。OWASP 日志规范给出的处理优先级是：<code>不记录 → 遮蔽 → 哈希/假名化 → 加密</code>，能不记就不记，必须记就变形。</li>
+  </ul>
+
+  <div class="field-card">
+    <h4>字段 ① pairing 标识的不可逆哈希</h4>
+    <div class="lens pro"><div class="lens-title">🔧 专业视角</div>
+      pairing_id 是两个设备配对关系的标识。直接存它，等于在服务器上留了一张「设备关系图谱」。改成 <code>HMAC-SHA256(pairing_id, server_secret)</code> 之类的单向哈希后，Relay 仍能把同一条链路的多次事件关联起来（同一哈希 = 同一链路），但拿到数据库的人无法反推出 pairing_id，更无法关联到真实设备。</div>
+    <div class="lens story"><div class="lens-title">🏨 例子</div>
+      酒店登记本上不写真名，写「314 号房客」。酒店内部知道 314 是谁，但登记本被偷走也没用——外面的人看到一串「314、207、314」，只知道同一个人来了两次，不知道是谁。<strong>这就是「假名化」：可关联，不可指认。</strong></div>
+  </div>
+
+  <div class="field-card">
+    <h4>字段 ② 时间戳</h4>
+    <div class="lens pro"><div class="lens-title">🔧 专业视角</div>
+      排障的第一问永远是「什么时候」。时间戳是五字段里唯一几乎无法压缩的信息——但注意 PRD 没写精度。保留到秒还是到分钟，隐私含义不同：秒级时间戳配合大小区间可以做流量分析（traffic analysis）。这是实现阶段的一个细节决策点。</div>
+    <div class="lens easy"><div class="lens-title">🌱 小白视角</div>
+      就是「几月几号几点几分，这封信经过了中转站」。没有它，排障等于没有时间轴的侦探小说。</div>
+  </div>
+
+  <div class="field-card">
+    <h4>字段 ③ 消息大小区间</h4>
+    <div class="lens pro"><div class="lens-title">🔧 专业视角</div>
+      注意是<strong>区间</strong>（如 <code>SIZE_1_4KB</code>），不是精确字节数。为什么不能存精确值？因为密文长度与明文长度强相关——精确长度长期累积，配合时间戳可能泄露行为模式（「每天 23:00 有一条 ~2KB 消息」≈ 每晚写一条短日记）。区间化是有意的信息有损压缩：够判断「是不是异常大包触发了限流」，不够做内容画像。</div>
+    <div class="lens story"><div class="lens-title">🏨 例子</div>
+      快递底单上只写「小件 / 中件 / 大件」，不写「3.742 kg」。查「包裹是不是超重被拒收」够用了，但没人能从「中件」推出你寄的是书还是衣服。</div>
+  </div>
+
+  <div class="field-card">
+    <h4>字段 ④ 投递结果</h4>
+    <div class="lens pro"><div class="lens-title">🔧 专业视角</div>
+      枚举值：成功投递 / 对端不在线不可投递（对应错误码 <code>ROUTE_NOT_DELIVERED</code>）等。这是回答「送没送到」的唯一字段，也是 AC-019 的用户体验配套——手机端收到「不可投递」回执后不能假装已发送。它本身不含任何内容信息，敏感度最低。</div>
+    <div class="lens easy"><div class="lens-title">🌱 小白视角</div>
+      快递底单上的「已签收 / 收件人不在，退回」。就这一个勾选项。</div>
+  </div>
+
+  <div class="field-card">
+    <h4>字段 ⑤ 错误类别</h4>
+    <div class="lens pro"><div class="lens-title">🔧 专业视角</div>
+      失败原因的分桶标签：限流、认证失败、配对已撤销、版本不兼容……（对应 PRD 7.4 稳定错误码族）。注意是「类别」不是「错误详情」——详情里可能带 IP、设备信息等，类别只有枚举值。排障时它的价值是模式识别：「这个哈希的链路三天内认证失败 40 次」指向凭证损坏或攻击尝试。</div>
+    <div class="lens story"><div class="lens-title">🏨 例子</div>
+      底单备注栏只允许盖章：「地址有误」「收件人拒收」「超过重量」。不许写小字。章能统计规律，小字会泄露隐私。</div>
+  </div>
+
+  <h3>2.6 为什么这五样「加起来」仍然脱敏？</h3>
+  <p>单个看，每个字段都无害；真正的隐私工程问题永远是<strong>组合后能否重新识别个人</strong>。对这套字段清单做一遍攻击推演：</p>
+  <table>
+    <tr><th>攻击者拿到 30 天审计库后能推出什么？</th><th>推不出什么？</th></tr>
+    <tr><td>某条链路（哈希）的活跃规律：每天大约几条、什么时段、消息量级</td><td>链路背后是谁（哈希不可逆）</td></tr>
+    <tr><td>全站总量与错误分布（运营大盘）</td><td>任何一条消息的内容、标题、摘要</td></tr>
+    <tr><td>某链路是否经历过故障</td><td>故障消息里写了什么</td></tr>
+  </table>
+  <div class="candour">
+    <b>有争议 / 失效条件：</b>「脱敏」不是绝对状态。如果攻击者<strong>同时</strong>掌握审计库和另一份外部信息（比如「张三每天 23:00 写日记」），时间戳 + 频率的组合可能完成「链接攻击」把哈希重新指认到人。学界称这类数据为「假名化」而非「匿名化」——GDPR 下假名化数据仍属个人数据。这正是保留期限要短的根本理由：<strong>敞口关不死，就让它开得短。</strong>
+  </div>
+</section>
+
+<!-- ==================== 第三章 ==================== -->
+<section class="chapter" id="ch3">
+  <h2>第三章 · 保留期限的学问：为什么期限本身是个独立问题</h2>
+  <div class="chapter-guide">
+    <b>本章导览</b>
+    上一章讲清了「记什么」，这一章讲「记多久」。你会看到：保留期限不是拍脑袋的数字，它背后有三股力量在拉扯——排障需要（越长越好）、隐私原则（越短越好）、法律法规（某些场景有硬性下限）。读完你会知道 30 天在业界标尺上处于什么位置，以及一个必须向法务确认的中国法特殊问题。
+  </div>
+
+  <h3>3.1 一条审计元数据的生命周期</h3>
+  <figure>
+    <img src="assets/fig2-lifecycle.png" alt="审计元数据生命周期流程图">
+    <figcaption>图 2 · 从产生到自动删除的六个阶段。「到期自动删除」是系统行为，不是运维自觉——PRD 9.2 的「脱敏日志检查」验收项应当覆盖它。</figcaption>
+  </figure>
+  <p>关键工程性质：<strong>删除必须是默认动作</strong>。GDPR 实务界的共识（EDPB 2024/2025 执法报告）是：监管机构把「没有成文保留时间表」和「声称会删但没有自动删除机制」都视为违规。落到 Utell 的实现上，这意味着 Relay 需要一个定时清除任务，并且「到期数据确实被物理删除」要写成自动化测试，进发布门禁。</p>
+
+  <h3>3.2 三股拉扯的力量</h3>
+  <table>
+    <tr><th>力量</th><th>方向</th><th>依据</th></tr>
+    <tr><td><strong>排障与取证</strong></td><td>越长越好</td><td>用户反馈有滞后性——「上周三好像丢了一条」这类报告，7 天的窗口根本盖不住。安全事件的发现滞后在业界以「月」计。</td></tr>
+    <tr><td><strong>数据最小化原则</strong></td><td>越短越好</td><td>GDPR 第 5(1)(e) 条「存储限制」、中国《个人信息保护法》第 19 条「保存期限应为实现处理目的所必要的最短时间」——两大法域用的是同一句话：必要即删。</td></tr>
+    <tr><td><strong>法定留存下限</strong></td><td>某些场景不许太短</td><td>中国《网络安全法》第 21 条要求网络运营者留存相关网络日志<strong>不少于六个月</strong>。这与「30 天」存在潜在冲突，见下方风险框。</td></tr>
+  </table>
+
+  <div class="candour risk">
+    <b>⚠ 必须在确认 C2 前向法务澄清的问题：</b>如果 Relay 部署在中国境内、面向中国用户提供服务，《网络安全法》第 21 条的「网络日志留存不少于六个月」是否覆盖 Relay 的审计元数据？业界对这个条款的适用范围有不同解读（脱敏到假名化程度的数据是否仍属「网络日志」存在争议），但<strong>这是「30 天」方案最大的合规不确定性</strong>。可能的出路：①将审计元数据进一步匿名化到法规适用范围之外（不可逆、不可关联）；②将法定要求的「网络安全日志」（如登录认证、DDoS 防护日志）与「业务路由审计」分开设计——前者按 6 个月留，后者按 30 天留。当前 PRD 把「隐私合规：Relay 元数据、30 天保留」列为发布前待确认项（8.3），方向是对的，C2 的确认不应绕过这一步。
+  </div>
+
+  <h3>3.3 业界标尺：30 天处在什么位置？</h3>
+  <figure>
+    <img src="assets/fig4-benchmark.png" alt="保留期限业界参照标尺">
+    <figcaption>图 4 · 从「几乎不存」（Signal）到「30 个月」（美国联邦政府）的完整光谱。30 天落在「应用访问日志业界惯例」区间，明显短于各类法定/合规下限。</figcaption>
+  </figure>
+  <ul class="tight">
+    <li><strong>Signal（隐私标杆）</strong>：服务器可被法院传票调出的数据只有两项——账户注册日期、最后活跃日期（且精度只到天）。这是「能用设计消灭的数据就不留」的极致。</li>
+    <li><strong>GDPR 实务指南的行业惯例</strong>：调试日志 7–14 天、应用/API 访问日志 30–60 天、错误日志 30–90 天、安全审计日志约 1 年。<strong>30 天正好落在「应用访问日志」区间的下沿</strong>——对 Relay 这种路由型服务，是教科书式的选择。</li>
+    <li><strong>合规框架（SOC2 / ISO 27001 / OMB M-21-31）</strong>：这些面向「安全审计」的框架普遍要求 90 天到 30 个月。注意它们针对的是<strong>企业内控场景</strong>（防内部作恶、配合司法取证），与 Utell 这种「个人自有数据、端到端加密」的产品形态不同——Utell 的 Relay 没有理由背负企业级留存负担。</li>
+  </ul>
+  <div class="candour">
+    <b>坦白标注（这里简化了）：</b>上图的「业界惯例」数字来自多家 GDPR 实务指南与工程博客的共识区间，不是法律条文本身——GDPR 和 PIPL 都故意不写具体天数，把论证义务留给企业。NIST SP 800-92（美国日志管理指南）同样不规定天数，只要求「基于风险评估自定并文档化」。这反而说明：<strong>选 30 天是否站得住，取决于 Utell 能不能把「为什么 30 天够用」写成书面论证</strong>——而这篇文档就是论证的起点。
+  </div>
+</section>
+
+<!-- ==================== 第四章 ==================== -->
+<section class="chapter" id="ch4">
+  <h2>第四章 · 四个选项正面对决</h2>
+  <div class="chapter-guide">
+    <b>本章导览</b>
+    前三章把概念、字段、期限的学问都备齐了，这一章回到 C2 本身：四个选项各自的优缺点、适用场景，以及基于前文分析的推荐结论。
+  </div>
+
+  <figure>
+    <img src="assets/fig3-tradeoff.png" alt="四选项隐私与排障权衡地图">
+    <figcaption>图 3 · 隐私 × 排障二维权衡。四选项共享同一份脱敏字段清单，差别只在「留多久」。</figcaption>
+  </figure>
+
+  <table>
+    <tr>
+      <th>选项</th><th>排障/取证能力</th><th>隐私敞口</th><th>合规姿态</th><th>致命短板</th>
+    </tr>
+    <tr>
+      <td><strong>① 30 天</strong><br>（PRD 推荐）</td>
+      <td class="good">覆盖「用户隔一两周才反馈」的真实节奏；月度错误模式可分析</td>
+      <td>哈希+时间戳组合敞口开 30 天</td>
+      <td class="good">落在 GDPR 实务惯例区间；论证最容易写</td>
+      <td>可能不满足中国《网络安全法》6 个月日志下限（待法务裁决，见 3.2）</td>
+    </tr>
+    <tr>
+      <td><strong>②a 7 天</strong></td>
+      <td>只能查「最近一周」；跨周反馈基本抓瞎</td>
+      <td class="good">敞口最短（除不保留外）</td>
+      <td>论证好写，但与 PRD 8.1 可观测性 P0 要求有张力</td>
+      <td>用户「上周丢了一条」的典型投诉场景直接无解，客服成本转嫁给人工复现</td>
+    </tr>
+    <tr>
+      <td><strong>②b 90 天</strong></td>
+      <td class="good">季度级模式分析；慢速攻击可追踪</td>
+      <td class="bad">敞口最长，时间序列足够画出行为习惯画像</td>
+      <td>需要书面论证「为什么必要」；PIPL 最短必要原则下负担最重</td>
+      <td>对一个「个人日记」产品，90 天的行为时间线超出排障的真实需要——多出来的 60 天买到的主要是心理安慰</td>
+    </tr>
+    <tr>
+      <td><strong>③ 不保留</strong><br>（只留实时日志）</td>
+      <td class="bad">接近归零：只能看「现在正在发生的」</td>
+      <td class="good">零敞口，隐私叙事最漂亮</td>
+      <td>反而难过审——PRD 9.2 要求「脱敏日志检查」和安全事件取证，无存档则无法自证</td>
+      <td>首发阶段（内部测试用户、每阶段观察 7 天的灰度期）恰恰是故障最密集、最需要回看的时期；此时自废排障能力，违背 PRD 9.1 的灰度发布设计</td>
+    </tr>
+  </table>
+
+  <h3>4.1 三层讲解：四种方案到底差在哪</h3>
+  <div class="lens pro"><div class="lens-title">🔧 专业视角</div>
+    这是一个 <em>detection lag × exposure window</em> 的优化问题。保留期 T 需要覆盖「故障发生 → 用户察觉 → 用户反馈 → 工程师开始查」的总滞后。内部灰度期用户是同事，滞后约 1–3 天，7 天看似够；但 PRD 9.1 设计的是逐阶段放量的灰度发布，外部用户反馈链条长得多（遇到故障 → 不确定是不是自己网络问题 → 过几天又发生 → 才来反馈），经验值 2–4 周。T=30 天是这个滞后分布的 P90 覆盖；T=7 天只覆盖 P50 左右。同时 T 又线性放大数据库泄露时的敞口——所以选能盖住排障滞后的<strong>最短</strong>值，这就是 30 天的推导逻辑，而不是「30 是个整数好听」。
+  </div>
+  <div class="lens easy"><div class="lens-title">🌱 小白视角</div>
+    选保留期就像选牛奶保质期：太短（7 天），问题还没被发现奶就扔了；太长（90 天），冰箱里一直躺着过期风险；不保留，等于家里根本没冰箱。30 天是「够用到下次采购」的常规选择——够用，且不会堆出风险。
+  </div>
+  <div class="lens story"><div class="lens-title">🏨 例子</div>
+    回到酒店登记本：「7 天销毁」意味着客人退房 10 天后投诉「我的访客被拦」，前台只能说「查不到了」；「90 天」意味着登记本攒了三个月，一旦被偷，小偷能看到你一整个季度的访客规律；「不登记」意味着任何投诉都无从查证，而且一旦发生安全事故（有人在酒店闹事），酒店连「那晚谁进过 314」都答不出。<strong>30 天是「投诉热度还没凉，登记页就烧了」的节奏。</strong>
+  </div>
+
+  <div class="verdict">
+    <h3>✅ 分析结论：推荐选项 ①（接受 30 天），但带三个附加条件</h3>
+    <ul class="tight">
+      <li><strong>条件一</strong>：「到期自动删除」必须落实为 Relay 的定时任务 + 自动化测试，进 PRD 9.2 发布门禁——删除不能靠运维自觉。</li>
+      <li><strong>条件二</strong>：C2 的确认必须联动 PRD 8.3 的「隐私合规」待确认项，由法务裁决《网络安全法》6 个月条款的适用性；若适用，把「网络安全日志」与「业务路由审计」拆成两套留存策略。</li>
+      <li><strong>条件三</strong>：在需求确认台账中写明 30 天的论证依据（用户反馈滞后分布 + GDPR/PIPL 最小必要原则 + 业界惯例区间），让「为什么是 30」可被后来的评审者追溯。</li>
+    </ul>
+    <p style="margin-bottom:0">如果法务确认 6 个月条款适用且无法拆分，选项退化为「审计元数据 30 天 + 法定网络安全日志 180 天」的双层结构——这并不推翻本分析的结论，只是把合规下限那部分挪出 C2 的范围。</p>
+  </div>
+</section>
+
+<!-- ==================== 第五章 ==================== -->
+<section class="chapter" id="ch5">
+  <h2>第五章 · 全书回顾与值得深挖的方向</h2>
+
+  <h3>5.1 一页纸回忆索引</h3>
+  <p>Utell 的 Relay 是端到端加密链路里「戴眼罩的邮递员」，唯一允许落盘的是五个脱敏审计字段（pairing 哈希、时间戳、大小区间、投递结果、错误类别）——它们<strong>可关联、不可指认</strong>，属于假名化而非匿名化。C2 要定的不是「记不记」（排障、安全取证、合规自证都要求记），而是「记多久」。期限由三股力量拉扯：排障滞后（要长）、最小必要原则（要短）、法定下限（特定场景不许太短）。30 天落在 GDPR 实务惯例的应用日志区间，能覆盖灰度期用户反馈的滞后分布，是四选项中隐私与排障的平衡点——唯一悬而未决的是中国《网络安全法》6 个月日志条款的适用性，需法务裁决。</p>
+
+  <h3>5.2 值得继续深挖的方向</h3>
+  <ul class="tight">
+    <li><strong>假名化 vs 匿名化的法律分界线</strong>：GDPR 下两者的合规待遇完全不同，决定了「进一步匿名化以退出法规范畴」这条路是否可行。</li>
+    <li><strong>流量分析攻击（traffic analysis）</strong>：为什么时间戳精度和大小区间粒度是隐私工程的细节战场，Signal sealed sender 也没有完全解决它。</li>
+    <li><strong>Relay 审计存储的实现选型</strong>：独立存储、写入即只读（append-only）、删除凭证——「自动删除」在工程上怎么证明「真的删了」。</li>
+    <li><strong>《网络安全法》第 21 条在「端到端加密个人工具」场景的适用判例</strong>：这是把 C2 从「待确认」变成「已确认」的最后一公里。</li>
+  </ul>
+
+  <h3>5.3 参考资料</h3>
+  <p class="src">项目内：PRD（FR-008 / 7.2 / 8.1 / 8.3 / 9.2）·《架构基线》·《06-安全隐私与数据留存规范》·《需求确认台账》C2 条目</p>
+  <p class="src">业界与法规：
+    <a href="https://cheatsheetseries.owasp.org/cheatsheets/Logging_Cheat_Sheet.html">OWASP Logging Cheat Sheet</a> ·
+    <a href="https://www.edpb.europa.eu/system/files/2025-01/edpb_cef-report-2024_20250116_rightofaccess_en.pdf">EDPB 2024 执法报告</a> ·
+    <a href="https://last9.io/blog/gdpr-log-management/">GDPR Log Management 实务指南（Last9）</a> ·
+    <a href="https://csrc.nist.gov/publications/detail/sp/800-92/final">NIST SP 800-92 日志管理指南</a> ·
+    <a href="https://signal.org/bigbrother/">Signal 传票回应公开页</a> ·
+    <a href="https://discuss.privacyguides.net/t/proton-is-signal-safe/33738">PrivacyGuides 论坛：Signal 元数据讨论</a> ·
+    《中华人民共和国个人信息保护法》第 19 条 · 《中华人民共和国网络安全法》第 21 条
+  </p>
+</section>
+
+<footer>
+  NEW-Utell 技术栈学习理解文档库 · 生成于 2026-08-23 · 本文档服务于需求问答 C2 的确认决策
+</footer>
+
+</div>
+</body>
+</html>
