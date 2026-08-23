@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>D3b：公网 TLS/WSS 边缘代理？</title>
+<style>
+:root{--ink:#172033;--muted:#5b6473;--blue:#2563eb;--green:#059669;--amber:#c27803;--red:#dc2626;--purple:#6d28d9;--bg:#f7f9fc;--card:#fff;--line:#dfe5ed}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;font-size:16px;line-height:1.82;overflow-x:hidden;max-width:100vw}.wrap{width:100%;min-width:0;max-width:980px;margin:0 auto;padding:34px 24px 90px}
+header.book{width:100%;min-width:0;color:#fff;border-radius:16px;padding:40px 42px;margin-bottom:28px;background:linear-gradient(135deg,#0f3b55,#1d4ed8 55%,#047857)}header.book .tag{font-size:13px;letter-spacing:1.5px;opacity:.86;overflow-wrap:anywhere;word-break:break-word}header.book h1{margin:10px 0 12px;font-size:32px;line-height:1.35;max-width:100%;overflow-wrap:anywhere;word-break:break-word;white-space:normal}.mobile-only{display:none}header.book p{margin:0;opacity:.94;font-size:15px;max-width:100%;overflow-wrap:anywhere;word-break:break-word}
+nav.toc{width:100%;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px 28px;margin-bottom:32px}nav.toc h2{margin:0 0 10px;color:var(--blue);font-size:18px}nav.toc ol{margin:0;padding-left:23px}nav.toc li{margin:4px 0;font-size:15px;overflow-wrap:anywhere}nav.toc a{color:var(--ink);text-decoration:none;border-bottom:1px dashed #b9c2cf;overflow-wrap:anywhere}nav.toc a:hover{color:var(--blue)}
+section.chapter{width:100%;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:34px 38px;margin-bottom:30px}section.chapter>h2{display:inline-block;max-width:100%;overflow-wrap:anywhere;margin:0 0 8px;padding-bottom:10px;border-bottom:3px solid var(--blue);font-size:24px;line-height:1.4}.guide{margin:15px 0 24px;padding:14px 18px;border-left:4px solid var(--blue);border-radius:0 9px 9px 0;color:#1e40af;background:#eef5ff;font-size:14.5px;overflow-wrap:anywhere}.guide b{display:block;margin-bottom:3px}h3{margin:30px 0 9px;font-size:19px;line-height:1.5}h4{margin:22px 0 7px;color:var(--blue);font-size:16px}p{margin:10px 0;overflow-wrap:anywhere}ul,ol{padding-left:24px}li{margin:5px 0;overflow-wrap:anywhere}
+figure{margin:24px 0;text-align:center}figure img{width:100%;max-width:900px;height:auto;border:1px solid var(--line);border-radius:10px;box-shadow:0 4px 18px rgba(15,23,42,.08)}figcaption{margin-top:8px;color:var(--muted);font-size:13.5px;line-height:1.6}
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.2px}th,td{border:1px solid var(--line);padding:10px 11px;text-align:left;vertical-align:top}th{background:#f0f4f8;font-weight:700}tr:nth-child(even) td{background:#fbfcfe}
+code{padding:1px 6px;border-radius:5px;color:#0f172a;background:#eef2f7;font:13.5px/1.5 "SF Mono",Menlo,Consolas,monospace}pre{overflow:auto;margin:16px 0;padding:17px 19px;border-radius:9px;color:#e5edf7;background:#111827;font:13.4px/1.7 "SF Mono",Menlo,Consolas,monospace}pre code{padding:0;color:inherit;background:transparent}
+.note,.analogy,.verdict,.candour{margin:15px 0;padding:15px 19px;border-radius:9px;font-size:14.8px}.note{border-left:4px solid var(--green);background:#ecfdf5}.caution{border-left:4px solid var(--amber);background:#fff8e7}.risk{border-left:4px solid var(--red);background:#fff1f2}.note .title,.analogy .title{margin-bottom:5px;font-weight:700}.note .title{color:var(--green)}.caution .title{color:var(--amber)}.risk .title{color:var(--red)}.analogy{border:1px solid #ddd6fe;background:#f5f3ff}.analogy .title{color:var(--purple)}.candour{border:1px dashed var(--amber);background:#fffaf0}.candour b{color:var(--amber)}.verdict{border:2px solid var(--green);background:linear-gradient(135deg,#ecfdf5,#eff6ff)}.verdict h3{margin-top:0;color:var(--green)}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:18px 0}.step{position:relative;min-height:112px;padding:12px 13px;border:1px solid var(--line);border-radius:9px;background:#fff}.step:not(:last-child)::after{content:"→";position:absolute;right:-14px;top:39px;z-index:2;color:var(--blue);font-size:22px;font-weight:700}.step b{display:block;margin-bottom:4px;color:var(--blue)}
+.sources{font-size:13.5px;color:var(--muted)}.sources li{margin:8px 0}.sources a{color:var(--blue);overflow-wrap:anywhere}.small{color:var(--muted);font-size:13.5px}.back{text-align:right;font-size:13px}.back a{color:var(--blue)}footer{margin-top:40px;text-align:center;color:var(--muted);font-size:13px}
+@media(max-width:760px){.wrap{width:100vw;max-width:100vw;padding:18px 13px 55px}header.book,nav.toc,section.chapter{width:calc(100vw - 26px);max-width:calc(100vw - 26px)}header.book{padding:28px 24px;border-radius:12px}header.book h1{font-size:25px;line-height:1.45;word-break:break-all}header.book p{font-size:14px;word-break:break-all}.mobile-only{display:block}section.chapter{padding:24px 19px}section.chapter>h2{font-size:21px}.grid{grid-template-columns:1fr 1fr}.step:not(:last-child)::after{display:none}table{display:block;overflow-x:auto;white-space:normal}th,td{min-width:130px}}
+</style>
+</head>
+<body>
+<div class="wrap" id="top">
+<header class="book">
+<div class="tag">NEW-Utell-server · 技术栈学习理解文档库 · D3b · 2026-08-23 联网复核</div>
+<h1>D3b：公网 TLS/WSS <br class="mobile-only">边缘代理？</h1>
+<p>把公网 443 端口、证书自动续期、WebSocket 长连接和 Relay 之间的关系从零讲清。候选：Caddy（暂定推荐）、Nginx、Go 服务直连 TLS（autocert）。这是学习与评估材料，不替项目冻结技术栈。</p>
+</header>
+<nav class="toc"><h2>目录：先看地图，再走细节</h2><ol>
+<li><a href="#ch1">第 1 章 · 这扇“公网大门”到底是什么</a></li>
+<li><a href="#ch2">第 2 章 · 四个地基机制：TLS、ACME、WebSocket、长连接</a></li>
+<li><a href="#ch3">第 3 章 · Caddy：自动领证的轻量前台</a></li>
+<li><a href="#ch4">第 4 章 · Nginx：最成熟，但配置和证书要自己拼</a></li>
+<li><a href="#ch5">第 5 章 · Go 直连：少一个组件，多一份自担</a></li>
+<li><a href="#ch6">第 6 章 · 三方案对比、推荐与运维规避</a></li>
+<li><a href="#ch7">书末 · 一页回顾、验证清单与资料地图</a></li>
+</ol></nav>
+
+<section class="chapter" id="ch1">
+<h2>翻开这本书：先看全貌</h2>
+<div class="guide"><b>根本问题</b>Utell 的 Relay 要在公网接住手机和 Connector 的加密长连接。用户只认一个域名和一个安全入口（通常是 443 端口），而应用服务最好只暴露在本机或私网。于是需要一个站在公网边界的“前台”：它负责证明域名身份、完成传输层加密，再把连接交给 Relay。这个前台就是公网 TLS/WSS 边缘代理。</div>
+<p>先用一张图定位角色。“代理解开 TLS”并不等于“代理能读业务正文”：TLS 是运输途中给连接套的锁；如果 Utell 的业务消息仍做端到端加密，业务正文的钥匙只在手机和 Connector 两端。</p>
+<figure><img src="assets/d3b-fig1-edge-position.png" alt="公网边缘代理在手机、互联网和 Relay 之间的位置"><figcaption>图 1 · 边缘代理位于公网入口和内网 Relay 之间。外部用 <code>wss://</code>，内部可以是本机 <code>ws://127.0.0.1:8080</code>；是否允许明文只取决于这段链路是否可信。</figcaption></figure>
+<h3>本书的章节关系</h3>
+<div class="grid"><div class="step"><b>1. 位置</b>先知道代理保护哪一段、不能替代什么。</div><div class="step"><b>2. 机制</b>把证书、升级、超时、reload 的机器跑一遍。</div><div class="step"><b>3–5. 候选</b>分别看 Caddy、Nginx、Go 直连如何实现。</div><div class="step"><b>6–7. 裁决</b>用同一组维度比较，再给上线前清单。</div></div>
+<table><tr><th>路线</th><th>一句话</th><th>主要代价</th></tr>
+<tr><td><b>Caddy</b></td><td>一个轻量前台同时做自动 HTTPS 和原生 WebSocket 反代。</td><td>默认配置卸载会关闭旧 WebSocket；需要客户端重连和低频/有窗口的 reload 运维。</td></tr>
+<tr><td><b>Nginx</b></td><td>成熟的通用反向代理；WebSocket 和证书工具分别配置。</td><td>要手工转发升级头、调长连接超时，并把 certbot/acme.sh 与 reload 串起来。</td></tr>
+<tr><td><b>Go 直连</b></td><td>Go 进程自己监听 443，用 <code>autocert</code> 申请和续期证书。</td><td>没有前置代理可替你承担 WAF、配置分发、证书缓存和边界策略；代码进程重启仍会断线。</td></tr></table>
+<div class="note caution"><div class="title">取舍</div>本库沿用项目中“Go + Caddy”作为暂定评估方向，但仓库规则要求在用户批准前保持“待确认”。D3b 的结论是工程建议，不是已写入架构基线的事实。</div>
+<p><b>边界：</b>本文不选择手机/Connector 的端到端加密协议，不设计 Relay 的业务路由契约，也不比较云厂商负载均衡；只回答“谁站在公网门口终止 TLS 并把 WSS 交给 Relay”。</p>
+</section>
+
+<section class="chapter" id="ch2">
+<h2>第 2 章 · 四个地基机制</h2>
+<div class="guide"><b>本章要解决的问题</b>上一章把代理放到了链路中。本章解释代理每天实际做的四件事：TLS 握手、ACME 领证、WebSocket 升级、长连接的超时与 reload。后面三种方案只是把这四件事分配给不同组件。</div>
+<h3>2.1 TLS：每条连接的一次“验身份证 + 现场配钥匙”</h3>
+<p><b>TLS</b>（Transport Layer Security，传输层安全）是 HTTPS 和 WSS 中的加密层。客户端连接 <code>relay.example.com:443</code> 时，服务器送出包含域名、公钥和证书颁发机构签名的证书；客户端检查域名、有效期和签名，通过后双方用密钥交换算出本次连接的会话密钥。之后传输内容被加密，旁听者看不到原文。</p>
+<figure><img src="assets/d3b-fig2-tls-acme.png" alt="TLS握手和ACME自动领证流程图"><figcaption>图 2 · TLS 握手发生在每条连接建立时；ACME 领证发生在证书申请或续期时。两者都依赖“域名确实指向这台机器”的控制权。</figcaption></figure>
+<div class="analogy"><div class="title">生动例子：酒店前台与房间门锁</div>TLS 握手像入住酒店：前台出示营业执照（证书），你核对酒店名字和盖章机构；确认无误后，前台和你现场约定一把只用于这次入住的房卡密钥。房间里写日记的内容再加一把只有住客双方拥有的保险箱锁，这就是端到端加密。前台能确认你住进了“真酒店”，却不该拥有保险箱钥匙。</div>
+<h3>2.2 ACME：证书机构出的自动化考题</h3>
+<p><b>ACME</b>（Automatic Certificate Management Environment）是证书申请自动化协议。证书机构（CA）不接受一句“域名是我的”，而是发临时挑战，要求申请者从公网证明控制权。成功后签发公开信任的证书，手机无需安装自定义根证书。</p>
+<table><tr><th>挑战</th><th>验证动作</th><th>端口/前提</th><th>适合与限制</th></tr>
+<tr><td><b>HTTP-01</b></td><td>在 <code>/.well-known/acme-challenge/</code> 放令牌文件，CA 从公网读取。</td><td>只能走 80；DNS A/AAAA 要指向本机。</td><td>容易自动化；不能签发泛域名；多台机器必须都能回答同一令牌。</td></tr>
+<tr><td><b>TLS-ALPN-01</b></td><td>在 443 上进行带特殊 ALPN 值的 TLS 握手。</td><td>443 必须公网可达。</td><td>不依赖 80；客户端支持面较窄；不能签发泛域名。</td></tr>
+<tr><td><b>DNS-01</b></td><td>在 <code>_acme-challenge</code> 下写 TXT 记录，CA 查询它。</td><td>需要 DNS 服务商 API 凭据；不要求服务器开端口。</td><td>唯一支持泛域名；凭据放服务器有额外风险。</td></tr></table>
+<div class="note caution"><div class="title">失效条件</div>域名没指向服务器、80/443 被拦截、代理抢走挑战路径、证书缓存不持久，都会让“自动 HTTPS”续期失败。测试阶段应使用 CA staging，避免反复申请触发速率限制。</div>
+<h3>2.3 WSS：一次 HTTP 升级，随后变成双向管道</h3>
+<p><b>WebSocket</b> 是建立在 TCP 上的双向消息协议；<b>WSS</b> 就是把 WebSocket 放进 TLS。开场仍像 HTTP：客户端发 <code>GET /ws</code>，带 <code>Upgrade: websocket</code> 和 <code>Connection: Upgrade</code>。服务端返回 <code>101 Switching Protocols</code> 后，HTTP 请求/响应模式结束，双方随时互发消息。</p>
+<figure><img src="assets/d3b-fig3-ws-upgrade.png" alt="WebSocket Upgrade穿过反向代理的流程图"><figcaption>图 3 · 反向代理必须把升级意图传给后端。Nginx 官方文档明确指出 Upgrade/Connection 是逐跳头，不会自动转发；Caddy 的 reverse_proxy 会自动完成这一转换。</figcaption></figure>
+<h3>2.4 长连接的两个计时器：空闲超时与配置卸载</h3>
+<p>WebSocket 可能几天没有业务消息，但 TCP 连接仍活着。代理若只看到“很久没读到字节”，就会把它当死连接。Nginx 的 <code>proxy_read_timeout</code> 默认 60 秒，计时发生在两次读取之间；应用层 ping/pong 或把超时调大可以避免误杀。教学资料建议 ping/pong 设为 30–60 秒。</p>
+<p><b>reload</b> 是重新加载代理配置，不等于证书续期本身。Nginx 用旧 worker 排空实现优雅 reload；Caddy 默认让旧流立即关闭，也提供 <code>stream_close_delay</code> 给有限排空窗口；Go 直连没有独立代理 reload，代码发版重启进程同样会断。</p>
+<div class="analogy"><div class="title">生动例子：电话局的两种换班</div>Nginx 像“老班接完手里的电话再下班”：新电话交给新班，老电话继续走完；老班永远有人通话就会占资源，所以要设最晚下班时间。Caddy 默认像“整间电话局换班”：新配置立即上岗，旧电话被挂断；<code>stream_close_delay</code> 是给旧班留的有限交接窗口。客户端自动重连是必修课。</div>
+</section>
+
+<section class="chapter" id="ch3">
+<h2>第 3 章 · Caddy：自动领证的轻量前台</h2>
+<div class="guide"><b>本章导览</b>上一章讲完证书、升级和长连接。本章把它们合在 Caddy 里：看自动 HTTPS 触发条件、三行反代配置，以及 reload 断线这一条会影响 Utell 的运维约束。</div>
+<h3>3.1 Caddy 做了哪些工作？</h3>
+<p>Caddy 是带 HTTPS 自动化能力的 Web 服务器和反向代理。只要配置中出现域名、数据目录可写且持久化，它会向公开 CA 申请证书、在到期前续期，并把 80 重定向到 443。<code>reverse_proxy</code> 原生识别 WebSocket 升级，升级后进入双向隧道，不需手工写 Upgrade 头。</p>
+<pre><code># /etc/caddy/Caddyfile
+relay.example.com {
+    reverse_proxy 127.0.0.1:8080 {
+        # 可选：reload 后给旧 WSS 五分钟排空窗口
+        stream_close_delay 5m
+    }
+}</code></pre>
+<p>上面配置表示：Caddy 占用公网 80/443，外部使用 <code>wss://</code>；Relay 只监听本机 8080。不写 <code>stream_close_delay</code> 时，官方文档默认是“不延迟”，配置卸载会关闭旧流。</p>
+<h3>3.2 自动 HTTPS 的运行链路</h3>
+<ol><li>DNS 把域名 A/AAAA 指向云主机。</li><li>Caddy 发现公开域名，尝试 HTTP-01 或 TLS-ALPN-01。</li><li>CA 从 80 或 443 发起挑战，Caddy 回答临时令牌。</li><li>证书写入数据目录，TLS 握手时加载。</li><li>续期成功后替换证书；容器数据目录必须持久化。</li></ol>
+<div class="note"><div class="title">专业视角</div>“自动”是把 ACME 客户端、证书缓存、HTTP→HTTPS 重定向和 TLS 配置放进一个守护进程。组件少意味着故障面少，但证书、配置、代理进程也集中在同一个服务里。</div>
+<h3>3.3 reload 为什么仍是硬约束？</h3>
+<p>官方 <code>reverse_proxy</code> 文档写明：<code>stream_close_delay</code> 会在配置卸载时延迟关闭 WebSocket，默认没有延迟。社区和 GitHub 讨论说明，配置整体替换时旧 handler 不能永久保留；这个参数是“让连接有机会自然结束”，不是永久续命。</p>
+<figure><img src="assets/d3b-fig5-reload.png" alt="Nginx和Caddy reload时长连接命运对比"><figcaption>图 5 · Nginx 的旧 worker 可排空；Caddy 默认关闭旧流，延迟参数只能推迟关闭。issue 状态：#5471 Closed、#6420 Not planned、#7222 Open。</figcaption></figure>
+<div class="note risk"><div class="title">失效条件</div>把 Caddy reload 当成“无感热更新”会集中踢下线 WSS。客户端没有指数退避和抖动重连时，所有连接会同一秒打回服务器，形成重连风暴。</div>
+<h3>3.4 优点、代价与适用场景</h3>
+<table><tr><th>优点</th><th>代价</th><th>适合</th></tr><tr><td>自动申请/续期；WSS 原生；配置短；单机轻。</td><td>reload 默认断长连接；复杂路由和插件需验证版本；要理解数据目录和 Admin API。</td><td>首发单机、少量上游、希望降低证书和反代配置心智负担。</td></tr></table>
+<div class="analogy"><div class="title">生动例子：小型酒店的智能前台</div>Caddy 像会自动续办营业执照、会认 WebSocket 客人并把电话接到后厨的前台。更换整套工作手册时，手里的电话可能被挂断；要让客人自动回拨，或给旧前台留交接时间。</div>
+<h3>3.5 Caddy 上线规避</h3>
+<ol><li><b>reload 低频化：</b>证书续期由 Caddy 完成，不要把每次上游变化都写成整份配置 reload。</li><li><b>动态 upstream：</b>评估 Admin API 更新 upstream，减少整体配置卸载。</li><li><b>有限排空：</b>短会话可设 <code>stream_close_delay 5m</code>；长连接不要盲目无限延长，否则旧配置占内存。</li><li><b>客户端重连：</b>指数退避加随机抖动，先恢复 WSS 再恢复应用层会话。</li><li><b>先验证：</b><code>caddy validate --config /etc/caddy/Caddyfile</code> 通过后再 reload。</li></ol>
+</section>
+
+<section class="chapter" id="ch4">
+<h2>第 4 章 · Nginx：最成熟，但要自己拼齐链路</h2>
+<div class="guide"><b>本章导览</b>Caddy 解决“少配置、自动化”；Nginx 把每个开关显式写出来。本章读懂 Upgrade 头为何手工转发，再把空闲超时、证书续期和优雅 reload 串成运维链。</div>
+<h3>4.1 WebSocket 反代配置为何较长？</h3>
+<p>Nginx 官方文档指出，<code>Upgrade</code> 和 <code>Connection</code> 是逐跳请求头，默认不会从客户端传给后端。Nginx 收到后端 <code>101</code> 后才进入隧道模式，所以必须显式告诉后端“客户端想升级协议”。</p>
+<pre><code>map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
+}
+server {
+    listen 443 ssl;
+    server_name relay.example.com;
+    ssl_certificate /etc/letsencrypt/live/relay.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/relay.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    location /ws {
+        proxy_pass http://127.0.0.1:8080;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 1h;
+        proxy_send_timeout 1h;
+    }
+}</code></pre>
+<p>显式写 <code>proxy_http_version 1.1</code> 仍是清晰的兼容配置；不依赖某个小版本的默认变化。</p>
+<h3>4.2 证书自动化是第二套工具链</h3>
+<p>Nginx 是 TLS 终止器，但通常不替你完成 ACME 申请/续期。常见组合是 certbot 或 acme.sh，续期后用 deploy hook 检查配置并优雅 reload：</p>
+<pre><code>certbot renew --deploy-hook 'nginx -t &amp;&amp; nginx -s reload'</code></pre>
+<p>证书写入路径 → <code>nginx -t</code> 检查 → master 启动新 worker → 旧 worker 继续服务现有连接。若设 <code>worker_shutdown_timeout</code>，到了上限仍未结束的连接会被关闭；不设则反复 reload 可能长期保留旧 worker，吃掉内存。</p>
+<h3>4.3 优点、代价与适用场景</h3>
+<table><tr><th>优点</th><th>代价</th><th>适合</th></tr><tr><td>生态、监控、排障资料成熟；优雅 reload；复杂路由、限流、缓存、负载均衡选择多。</td><td>Upgrade 头、超时、证书工具和 deploy hook 都要自己拼；配置多，错一行就可能 400/502/60 秒断线。</td><td>已有 Nginx 经验或平台规范；多域名、多上游、需要成熟治理能力。</td></tr></table>
+<div class="analogy"><div class="title">生动例子：机场的分工柜台</div>Nginx 像大型机场：安检、登机、行李、调度各有柜台，流程成熟但表格很多。你能调到合规标准，却不能只填“目的地和后厨地址”。证书工具是另一个柜台，必须用交接单通知 reload。</div>
+<h3>4.4 常见失误</h3>
+<ul><li>忘记 <code>proxy_http_version 1.1</code> 或 Upgrade/Connection，客户端得不到 101。</li><li>保留 <code>proxy_read_timeout 60s</code>，无心跳的空闲 WSS 一分钟被断。</li><li>证书续期成功但没有 deploy hook，Nginx 仍加载旧证书；或 reload 前不做 <code>nginx -t</code>。</li><li>认为 reload 永远无损，忽略旧 worker 和 <code>worker_shutdown_timeout</code>。</li></ul>
+</section>
+
+<section class="chapter" id="ch5">
+<h2>第 5 章 · Go 直连：少一个组件，多一份自担</h2>
+<div class="guide"><b>本章导览</b>前两章把 TLS、ACME 和 WSS 交给专门代理。本章把它们收回 Go 进程：<code>autocert.Manager</code> 负责证书，<code>tls.Config</code> 负责 TLS，应用 handler 负责 WebSocket。组件最少，但边界工程也全部落到代码和进程管理上。</div>
+<h3>5.1 最小骨架</h3>
+<pre><code>manager := &amp;autocert.Manager{
+    Prompt: autocert.AcceptTOS,
+    Email: "ops@example.com",
+    Cache: autocert.DirCache("/var/lib/relay/autocert"),
+    HostPolicy: autocert.HostWhitelist("relay.example.com"),
+}
+app := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    // Relay 的 WebSocket handler
+})
+tlsServer := &amp;http.Server{
+    Addr: ":443", Handler: app, TLSConfig: manager.TLSConfig(),
+}
+go http.ListenAndServe(":80", manager.HTTPHandler(nil)) // HTTP-01
+log.Fatal(tlsServer.ListenAndServeTLS("", ""))</code></pre>
+<p><code>autocert.Manager</code> 是有状态的证书管理器：</p>
+<ul><li><b>Cache：</b>必须持久化（如 <code>DirCache</code>）跨重启复用证书和账户状态；否则容易撞 CA 速率限制。</li><li><b>HostPolicy：</b>限制允许申请的域名；留空会让任意 SNI 诱发错误申请。</li><li><b>TLSConfig：</b>把 <code>GetCertificate</code> 回调接入 TLS 握手，按域名提供证书。</li><li><b>HTTPHandler：</b>在 80 端口回答 HTTP-01。</li></ul>
+<h3>5.2 直连的运行边界</h3>
+<p>直连没有代理层的 <code>proxy_read_timeout</code> 配置，但必须实现等价策略：ping/pong、最大消息、写缓冲上限、慢消费者断开、连接数上限、访问日志脱敏、限流、健康检查和优雅关闭。证书热替换可以由 <code>GetCertificate</code> 完成，不必因续证重启；代码发版或崩溃恢复仍会断所有 WSS。</p>
+<figure><img src="assets/d3b-fig4-three-options.png" alt="Caddy、Nginx、Go直连三种组件结构对比"><figcaption>图 4 · 三个方案都能达到“443 + 自动证书 + WSS”，差异在组件数、配置责任和边界功能由谁承担。</figcaption></figure>
+<div class="note risk"><div class="title">安全边界</div>Go 进程直接暴露公网，证书私钥、TLS 参数、HTTP 头、连接限额和拒绝服务防护都由它负责。应用若把“端到端密文”误当作“不用做边界安全”，会把协议 bug、内存耗尽和日志泄露直接暴露给公网。</div>
+<h3>5.3 优点、代价与适用场景</h3>
+<table><tr><th>优点</th><th>代价</th><th>适合</th></tr><tr><td>只有一个进程；证书和应用状态在同一代码库；部署拓扑简单。</td><td>自建所有边界能力；进程发版会断线；应用与运维职责耦合；加 WAF/多服务要重新造轮子。</td><td>单一 Go 服务、极简单机、团队愿意长期维护 TLS/ACME/边界代码。</td></tr></table>
+<div class="analogy"><div class="title">生动例子：小店老板自己守门</div>直连像老板自己站门口：没有额外保安，钥匙、收银、会员卡都在一个人手里，开店最快。客流少时很省事；遇到排队、闹事、换班或多家分店，老板必须自己补上保安、调度员和审计员。</div>
+</section>
+
+<section class="chapter" id="ch6">
+<h2>第 6 章 · 三方案对比、推荐与运维规避</h2>
+<div class="guide"><b>本章导览</b>上三章分别证明了三条路线“能不能做”。本章沿同一条比较轴回答“哪条更贴 Utell 首发”：证书自动化、WSS 开箱程度、reload、配置心智、组件数量、未来功能上限。</div>
+<figure><img src="assets/d3b-fig6-matrix.png" alt="Caddy、Nginx、Go直连六维对比热力矩阵"><figcaption>图 6 · 热力矩阵表达取舍，不是性能基准；容量、RSS、文件描述符仍需 Spike 实测。</figcaption></figure>
+<table><tr><th>维度</th><th>Caddy</th><th>Nginx</th><th>Go 直连 autocert</th></tr>
+<tr><td>证书申请/续期</td><td>内置 ACME；域名配置正确即可管理。</td><td>certbot/acme.sh + deploy hook + reload。</td><td>内置库，但自设 Cache、HostPolicy、端口和日志。</td></tr>
+<tr><td>WSS 配置</td><td><code>reverse_proxy</code> 原生升级。</td><td>显式 Upgrade/Connection；调 1.1 和超时。</td><td>应用自己接 WebSocket 和 TLS。</td></tr>
+<tr><td>reload 行为</td><td>默认关闭旧流；延迟参数有限排空。</td><td>旧 worker 排空，需 shutdown 上限。</td><td>代码发布/重启会断全部连接。</td></tr>
+<tr><td>组件/故障面</td><td>Caddy + Relay。</td><td>Nginx + Relay + 证书工具链。</td><td>一个应用进程，边界职责集中。</td></tr>
+<tr><td>复杂路由/多服务</td><td>可做，需验证插件/API 版本。</td><td>最成熟。</td><td>继续在 Go 代码里实现。</td></tr>
+<tr><td>单 Owner 学习成本</td><td>低；要补 reload 认知。</td><td>中高；资料多。</td><td>协议和运维责任集中。</td></tr></table>
+<h3>6.1 选型决策树</h3>
+<div class="grid"><div class="step"><b>已有 Nginx 平台规范？</b>有：优先 Nginx，复用证书、监控和 reload 经验。</div><div class="step"><b>首发单机想少拼组件？</b>是：Caddy 是暂定首选。</div><div class="step"><b>必须把公网边界收进 Go？</b>是：Go 直连，但先补安全与容量 Spike。</div><div class="step"><b>WSS 长期不断线？</b>无论选谁：重连、心跳、排空和 reload 演练必选。</div></div>
+<div class="verdict"><h3>暂定建议：Caddy（待用户批准）</h3><p>在“单机首发、一个 Relay、证书自动续期、单 Owner、希望配置短”的前提下，Caddy 把 ACME 和 WebSocket 升级收进一个组件，心智负担最低。反对理由必须保留：默认 reload 关闭旧 WSS，动态配置仍要验证旧 handler 生命周期。</p><p><b>建议路径：</b>先用 Caddy 做首发 Spike；实现稳定重连和低频 reload；实测 <code>stream_close_delay</code> 的内存/排空；若已有 Nginx 平台或要求更长无损排空，改选 Nginx；若必须只有一个 Go 进程，再评估 Go 直连。</p></div>
+<h3>6.2 三套共同上线流程</h3>
+<ol><li><b>DNS/端口：</b>确认 A/AAAA、80/443 公网连通和云安全组。</li><li><b>证书：</b>先 staging；检查 SAN、过期时间和持久化目录；再切生产 CA。</li><li><b>升级：</b>用 <code>wscat</code>/<code>websocat</code> 连接 <code>wss://relay.example.com/ws</code>，确认 101 和双向收发。</li><li><b>空闲：</b>静默超过默认超时一半，验证 ping/pong和断开原因。</li><li><b>reload/重启：</b>保持长连接，改无关配置，记录断线、重连、内存、worker/handler 数量。</li><li><b>回滚：</b>配置验证失败不得替换线上配置；证书续期失败必须告警。</li></ol>
+<h3>6.3 最小验收命令</h3>
+<pre><code>openssl s_client -connect relay.example.com:443 -servername relay.example.com
+curl -I http://relay.example.com
+wscat -c wss://relay.example.com/ws
+ss -tnp | grep ':443'
+journalctl -u caddy --since '10 min ago'</code></pre>
+<div class="note caution"><div class="title">这里简化了</div>看到 101 只证明入口能握手，不证明 Relay 的应用层身份、ACK、重放防护、背压和端到端加密契约；那些属于独立验收项。</div>
+</section>
+
+<section class="chapter" id="ch7">
+<h2>书末 · 一页回顾、验证清单与资料地图</h2>
+<p><b>一句话回顾：</b>公网 TLS/WSS 边缘代理是站在 443 门口的前台：用证书证明域名并加密运输，用 ACME 自动领证和续期，把 HTTP 升级成双向管道，再把连接交给内网 Relay。Caddy 把手续打包，代价是默认 reload 关闭旧流；Nginx 把开关摊开，代价是证书和 WebSocket 要自己拼；Go 直连少组件，代价是边界安全、限流和重启影响由 Owner 自担。</p>
+<h3>值得深挖的方向</h3>
+<ol><li><b>Caddy Admin API 与动态 upstream：</b>验证哪些变更不会卸载旧 handler。</li><li><b>长连接容量 Spike：</b>在 1 万/10 万空闲 WSS 下测 RSS、文件描述符、心跳和重连风暴。</li><li><b>慢消费者背压：</b>明确写缓冲、最大消息、断开阈值和恢复策略。</li><li><b>ACME 密钥权限：</b>把 Caddy 数据目录或 autocert cache 当高敏感资产限权、备份和监控。</li><li><b>端到端加密边界：</b>确认代理/Relay 看到的仍只是业务密文，日志不能带出端点明文。</li></ol>
+<h3>联网复核资料地图（访问：2026-08-23）</h3>
+<p class="small">官网/规范负责确认机制和默认值；论坛与 issue 负责确认真实运维行为；教学文章用于交叉检查配置坑。</p>
+<ol class="sources">
+<li><b>官方·Caddy</b>：<a href="https://caddyserver.com/docs/automatic-https">Automatic HTTPS</a>（自动证书、重定向、挑战与数据目录）。</li>
+<li><b>官方·Caddy</b>：<a href="https://caddyserver.com/docs/caddyfile/directives/reverse_proxy">reverse_proxy</a>（WebSocket、stream_timeout、stream_close_delay）。</li>
+<li><b>官方·Caddy</b>：<a href="https://caddyserver.com/docs/quick-starts/reverse-proxy">Reverse proxy quick-start</a>、<a href="https://caddyserver.com/docs/command-line">Command Line</a>。</li>
+<li><b>官方·Nginx</b>：<a href="https://nginx.org/en/docs/http/websocket.html">WebSocket proxying</a>、<a href="https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_read_timeout">proxy_read_timeout</a>。</li>
+<li><b>官方·Go</b>：<a href="https://pkg.go.dev/golang.org/x/crypto/acme/autocert">autocert</a>（Manager、DirCache、HostPolicy、HTTPHandler）。</li>
+<li><b>官方·Let's Encrypt</b>：<a href="https://letsencrypt.org/docs/challenge-types/">Challenge Types</a>、<a href="https://letsencrypt.org/docs/rate-limits/">Rate Limits</a>。</li>
+<li><b>论坛·Caddy Community</b>：<a href="https://caddy.community/t/long-lived-wss-connections/18096">Long lived WSS connections</a>。</li>
+<li><b>社区·Caddy GitHub</b>：<a href="https://github.com/caddyserver/caddy/issues/5471">#5471 Closed</a>、<a href="https://github.com/caddyserver/caddy/issues/6420">#6420 Not planned</a>、<a href="https://github.com/caddyserver/caddy/issues/7222">#7222 Open</a>。</li>
+<li><b>教学·WebSocket.org</b>：<a href="https://websocket.org/guides/infrastructure/nginx/">Nginx WebSocket Proxy: Config, SSL &amp; Load Balancing</a>（Upgrade、TLS、超时、ping/pong示例）。</li>
+</ol>
+<div class="candour"><b>坦白标注（仍在演进）：</b>Caddy 的 reload/旧 handler 生命周期仍在社区 issue 中讨论；不同版本、配置 API 与插件可能改变细节。正式上线前必须用项目锁定版本做可重复的“长连接 + reload + 重连”实验，并写入发布证据。</div>
+<p class="back"><a href="#top">回到目录顶部</a></p>
+</section>
+<footer>NEW-Utell-server · 技术栈学习理解文档库 · D3b 公网 TLS/WSS 边缘代理 · 资料复核日期 2026-08-23</footer>
+</div>
+</body>
+</html>

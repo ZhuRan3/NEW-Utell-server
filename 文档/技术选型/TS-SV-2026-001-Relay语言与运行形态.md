@@ -1,6 +1,6 @@
 # TS-SV-2026-001 Relay 语言与运行形态
 
-> 状态：待确认（逐项确认流程中）
+> 状态：开发者已批准（2026-08-23）
 > **注意：本文件的候选框架与 AI 建议仅为调研参考材料（证据本身为 2026-08-22 实时核实，有效）；正式选型结论以逐项 Q&A 确认为准，确认前不得据此开始实现。**
 > Owner：Zhu3xx
 > 创建日期：2026-08-22
@@ -22,7 +22,7 @@
 - 公网入口 443/TLS/WSS；证书可自动续期。
 - Relay 不持端点私钥，不读取、解密或持久化业务正文；不建立离线业务队列。
 - 一个账号最多一台 active 主 Connector；replacement/撤销必须原子化。
-- 只保存 pairing、设备公钥、撤销、限流和最小脱敏审计元数据；审计留存期限待确认。
+- 只保存 pairing、设备公钥、撤销、限流和最小脱敏审计元数据；审计留存 14 天（Q-SV-2026-011 已确认）。
 - 必须支持心跳、ACK、序号、背压、限流、消息大小上限和稳定错误码。
 - 首发为单台云主机可承载的轻量部署；不引入 Kubernetes、Redis、Kafka 等重型依赖。
 - 必须提供健康检查、结构化脱敏日志、指标、备份/恢复和回滚。
@@ -35,7 +35,7 @@
 | B. Rust | tokio + axum/tokio-tungstenite + rusqlite（bundled）+ rustls | Rust 1.98.0（2026-08-20）；axum 0.8.9；tokio-tungstenite 0.30.0；rusqlite 0.40.2；rustls 0.23.43 | MIT OR Apache-2.0 |
 | C. Node/TypeScript | Node LTS + ws + better-sqlite3 | Node v24.19.0 Active LTS（2026-08-03）；ws 8.21.3（2026-08-07）；better-sqlite3 13.0.3（2026-08-05） | MIT |
 
-边缘代理候选（附属决定）：Caddy v2.11.4（自动 HTTPS、原生 WSS 反代，但配置 reload 会强制断开既有 WSS 长连接）；Nginx stable 1.30.4（WSS 需手工配置 Upgrade 头，证书自动化需自行组合）。
+边缘代理候选（附属决定）：Caddy v2.11.4（自动 HTTPS、原生 WSS 反代；默认配置卸载会关闭既有 WSS，`stream_close_delay` 只能提供有限排空窗口）；Nginx stable 1.30.4（WSS 需手工配置 Upgrade 头，证书自动化需自行组合）。
 
 ## 4. 证据
 
@@ -50,7 +50,7 @@
 | Node dist index.json / npm registry | E1 | v24 Active LTS（Krypton）；ws 与 better-sqlite3 均在 2026-08 当月发版，维护最活跃 |
 | Node SEA 文档 | E1 | 单文件打包为实验性，且对 better-sqlite3 这类 native 模块有限制；Node 非单二进制部署 |
 | Node "Don't block the event loop" 文档 | E1 | 单线程事件循环下 CPU 密集操作会阻塞全部连接，需 worker_threads 规避 |
-| Caddy reverse_proxy 文档 | E1 | 原生 WSS 反代 + 自动 HTTPS；reload 强制断开长连接，是 Relay 的关键运维约束 |
+| Caddy reverse_proxy 文档与社区 issue（#5471/#6420/#7222） | E1 | 原生 WSS 反代 + 自动 HTTPS；默认 `stream_close_delay=0` 时配置卸载关闭旧流，延迟参数只能有限排空，客户端仍需重连 |
 | Nginx WebSocket proxying 文档 | E1 | 功能成熟，需手工 Upgrade 头与自行证书自动化 |
 | 本机工具链审计 | E2 | Rust 1.94.1、Node v24.14.0 已就绪；Go 未安装（需安装工具链） |
 
@@ -77,7 +77,7 @@ Noise 生态说明（不计入本决策）：Rust snow 0.10.0 维护活跃；Go 
 
 ## 7. AI 建议
 
-- 推荐：候选 A（Go + coder/websocket + modernc.org/sqlite），边缘代理推荐 Caddy（接受 reload 断连约束并用运维流程规避，或后续以管理 API 动态 upstream 消除）。
+- 推荐：候选 A（Go + coder/websocket + modernc.org/sqlite），边缘代理暂定推荐 Caddy（接受默认 reload 关闭旧流的约束并用低频 reload、有限排空、客户端重连和后续管理 API 动态 upstream 对冲）。
 - 理由：Relay 的本职是 WSS 连接级路由 + 最小元数据 + 单机轻量部署。Go 在该边界内证据面最整齐：goroutine 天然匹配连接并发；纯 Go SQLite 使全链路无 cgo、单静态二进制；标准库 TLS 无第三方依赖；核心依赖均为活跃维护的稳定版。Noise 短板与 Relay 无关（E2EE 在端点终止）。
 - 关键假设：单 Owner 能在合理成本内安装并维护 Go 工具链；P0 容量为单机量级。
 - 置信度：中等（E1/E2 充分，E3 容量证据缺失）。
@@ -95,6 +95,9 @@ Noise 生态说明（不计入本决策）：Rust snow 0.10.0 维护活跃；Go 
 
 ## 8. 开发者决定
 
-- 决定：待确认
-- 批准人 / 日期：—
-- 理由 / 接受的剩余风险 / 必须补齐的证据 / 重审条件：—
+- 决定：候选 A——Go（1.27+）+ coder/websocket + modernc.org/sqlite（纯 Go 无 cgo）；边缘代理 Caddy（v2.11+，自动 HTTPS + 原生 WSS 反代）；云服务商阿里云（单台 ECS 轻量部署）（Q-SV-2026-014）
+- 批准人 / 日期：Zhu3xx / 2026-08-23
+- 理由：Relay 本职为 WSS 连接级路由 + 最小元数据 + 单机轻量部署；Go 证据面最整齐（goroutine 连接并发、全链路无 cgo 静态单二进制、标准库 TLS、活跃稳定依赖）；E2EE 在端点终止，Go 的 Noise 生态短板与 Relay 无关
+- 接受的剩余风险：长连接容量/背压无实测数据；Caddy reload 断连需运维规避（低频 reload、客户端重连、后续管理 API 动态 upstream）；Go 工具链需新装
+- 必须补齐的证据：第 7 节 Spike 清单 1-5（容量阶梯、背压、reload 影响、消息上限、资源基线）
+- 重审条件：Spike 证据显示 Go 路线不达标时，保持 Relay Transport 契约重审 Rust/Node；阿里云区域/备案问题出现时重审服务商
