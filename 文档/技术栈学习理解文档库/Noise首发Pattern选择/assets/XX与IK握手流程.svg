@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 820" role="img" aria-labelledby="title desc">
+  <title id="title">XX 与 IK Noise 握手流程对比</title>
+  <desc id="desc">左右两列展示 XX 三条消息和 IK 两条消息，以及静态公钥出现的位置。</desc>
+  <defs><style>
+    text{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",sans-serif;fill:#172033}.lane{stroke:#a0aec0;stroke-width:2;stroke-dasharray:7 7}.arrow{stroke-width:4;fill:none;marker-end:url(#arrow)}.msg{font-size:20px;font-weight:700}.note{font-size:17px}.head{font-size:28px;font-weight:800}
+  </style><marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0,0 L12,6 L0,12 z" fill="#334e68"/></marker></defs>
+  <rect width="1200" height="820" fill="#f7fafc"/>
+  <line x1="600" y1="35" x2="600" y2="790" stroke="#cbd5e0" stroke-width="3"/>
+  <text x="300" y="52" text-anchor="middle" class="head" fill="#047857">XX：首次见面，三句互验</text>
+  <text x="900" y="52" text-anchor="middle" class="head" fill="#1d4ed8">IK：已知对端，快速直达</text>
+  <rect x="55" y="82" width="490" height="66" rx="16" fill="#fee2e2" stroke="#dc2626" stroke-width="3"/>
+  <text x="300" y="110" text-anchor="middle" class="msg" fill="#b91c1c">开场无预条件</text>
+  <text x="300" y="136" text-anchor="middle" class="note">二维码/token 可先授权，再由握手交换身份</text>
+  <rect x="655" y="82" width="490" height="66" rx="16" fill="#fee2e2" stroke="#dc2626" stroke-width="3"/>
+  <text x="900" y="110" text-anchor="middle" class="msg" fill="#b91c1c">硬前提：手机先拿到 Connector 静态公钥</text>
+  <text x="900" y="136" text-anchor="middle" class="note">通常写进预消息并参与握手 hash</text>
+  <line x1="180" y1="210" x2="180" y2="720" class="lane"/><line x1="420" y1="210" x2="420" y2="720" class="lane"/>
+  <text x="180" y="195" text-anchor="middle" class="msg">手机 / Initiator</text><text x="420" y="195" text-anchor="middle" class="msg">Connector / Responder</text>
+  <line x1="190" y1="260" x2="410" y2="260" class="arrow" stroke="#2563eb"/><text x="300" y="242" text-anchor="middle" class="msg" fill="#2563eb">1. → e</text><text x="300" y="292" text-anchor="middle" class="note">只发临时公钥；旁观者看不到静态身份</text>
+  <line x1="410" y1="390" x2="190" y2="390" class="arrow" stroke="#059669"/><text x="300" y="372" text-anchor="middle" class="msg" fill="#059669">2. ← e, ee, s, es</text><text x="300" y="422" text-anchor="middle" class="note">Connector 发临时公钥，完成 DH，再加密发送静态公钥</text>
+  <line x1="190" y1="520" x2="410" y2="520" class="arrow" stroke="#7c3aed"/><text x="300" y="502" text-anchor="middle" class="msg" fill="#7c3aed">3. → s, se</text><text x="300" y="552" text-anchor="middle" class="note">手机加密发送自己的静态公钥；双方都能证明私钥持有</text>
+  <rect x="85" y="620" width="430" height="80" rx="16" fill="#dcfce7" stroke="#059669" stroke-width="3"/><text x="300" y="653" text-anchor="middle" class="msg" fill="#047857">握手完成：1.5 RTT</text><text x="300" y="680" text-anchor="middle" class="note">双方静态身份都已出现并可做指纹绑定</text>
+
+  <line x1="780" y1="210" x2="780" y2="720" class="lane"/><line x1="1020" y1="210" x2="1020" y2="720" class="lane"/>
+  <text x="780" y="195" text-anchor="middle" class="msg">手机 / Initiator</text><text x="1020" y="195" text-anchor="middle" class="msg">Connector / Responder</text>
+  <line x1="790" y1="300" x2="1010" y2="300" class="arrow" stroke="#2563eb"/><text x="900" y="282" text-anchor="middle" class="msg" fill="#2563eb">1. → e, es, s, ss</text><text x="900" y="333" text-anchor="middle" class="note">首条就带手机静态身份；可带 0-RTT payload</text>
+  <line x1="1010" y1="470" x2="790" y2="470" class="arrow" stroke="#059669"/><text x="900" y="452" text-anchor="middle" class="msg" fill="#059669">2. ← e, ee, se</text><text x="900" y="503" text-anchor="middle" class="note">补临时 DH，完成双方会话密钥</text>
+  <rect x="685" y="620" width="430" height="80" rx="16" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/><text x="900" y="653" text-anchor="middle" class="msg" fill="#1d4ed8">握手完成：1 RTT</text><text x="900" y="680" text-anchor="middle" class="note">速度更快，但公钥绑定责任前移</text>
+</svg>

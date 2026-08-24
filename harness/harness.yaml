@@ -2,6 +2,7 @@ version: "0.1"
 owner: "Zhu3xx"
 repository_role: "server-relay"
 contract_profile: "integration-profile.pending"
+contract_profile_file: "harness/契约/integration-profile.yaml"
 paths:
   contracts: "harness/契约"
   fixtures: "harness/fixtures"
@@ -25,4 +26,3 @@ required_scenarios:
   - rate_limit_and_size
   - relay_restart
   - relay_cannot_decrypt
-

@@ -12,4 +12,5 @@ tmp/
 vendor/
 harness/evidence/*
 !harness/evidence/README.md
-
+!harness/evidence/*/
+!harness/evidence/*/*.md

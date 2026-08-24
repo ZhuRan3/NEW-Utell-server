@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Noise 首发 Pattern 选择总览思维导图</title>
+  <desc id="desc">从项目问题分出密码套件、XX、IK、配对绑定和冻结门禁五个分支。</desc>
+  <defs><style>
+    text{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB",sans-serif;fill:#172033}
+    .line{stroke:#718096;stroke-width:3;fill:none}.root{fill:#16324f}.rootText{fill:white;font-weight:700}.node{stroke-width:3}.label{font-size:23px;font-weight:700}.small{font-size:18px}.tiny{font-size:16px}
+  </style></defs>
+  <rect width="1200" height="760" fill="#f7fafc"/>
+  <path class="line" d="M600 380 C430 230 310 140 160 120 M600 380 C420 350 300 350 130 350 M600 380 C420 520 300 600 145 650 M600 380 C780 230 900 145 1055 120 M600 380 C790 390 930 420 1090 500"/>
+  <rect x="455" y="318" width="290" height="125" rx="22" class="root"/>
+  <text x="600" y="360" text-anchor="middle" class="rootText" font-size="31">D4：首发 Pattern</text>
+  <text x="600" y="402" text-anchor="middle" class="rootText" font-size="23">手机 ↔ Connector 的 E2EE</text>
+
+  <rect x="45" y="55" width="240" height="135" rx="18" fill="#dbeafe" stroke="#2563eb" class="node"/>
+  <text x="165" y="94" text-anchor="middle" class="label">密码套件</text>
+  <text x="165" y="126" text-anchor="middle" class="small">25519：密钥交换</text>
+  <text x="165" y="153" text-anchor="middle" class="small">ChaChaPoly：加密+验篡改</text>
+  <text x="165" y="177" text-anchor="middle" class="small">SHA256：滚动密钥搅拌</text>
+
+  <rect x="20" y="280" width="260" height="145" rx="18" fill="#dcfce7" stroke="#059669" class="node"/>
+  <text x="150" y="320" text-anchor="middle" class="label">XX：首发建议</text>
+  <text x="150" y="352" text-anchor="middle" class="small">3 条消息 / 1.5 RTT</text>
+  <text x="150" y="379" text-anchor="middle" class="small">双方现场交换静态身份</text>
+  <text x="150" y="406" text-anchor="middle" class="small">零预持有公钥，适合首次配对</text>
+
+  <rect x="35" y="570" width="250" height="135" rx="18" fill="#fef3c7" stroke="#d97706" class="node"/>
+  <text x="160" y="609" text-anchor="middle" class="label">配对绑定</text>
+  <text x="160" y="640" text-anchor="middle" class="small">二维码 + 一次性 token</text>
+  <text x="160" y="667" text-anchor="middle" class="small">指纹核对 = 人类确认</text>
+  <text x="160" y="694" text-anchor="middle" class="small">不是 Noise 自动替代的信任</text>
+
+  <rect x="875" y="55" width="280" height="145" rx="18" fill="#dbeafe" stroke="#2563eb" class="node"/>
+  <text x="1015" y="95" text-anchor="middle" class="label">IK：优化候选</text>
+  <text x="1015" y="127" text-anchor="middle" class="small">2 条消息 / 1 RTT</text>
+  <text x="1015" y="154" text-anchor="middle" class="small">可 0-RTT 带首个 payload</text>
+  <text x="1015" y="181" text-anchor="middle" class="small">前提：发起方已可靠持有对端静态公钥</text>
+
+  <rect x="915" y="425" width="240" height="160" rx="18" fill="#fee2e2" stroke="#dc2626" class="node"/>
+  <text x="1035" y="466" text-anchor="middle" class="label">冻结门禁</text>
+  <text x="1035" y="499" text-anchor="middle" class="small">双方角色与协议名</text>
+  <text x="1035" y="526" text-anchor="middle" class="small">固定 prologue / token 语义</text>
+  <text x="1035" y="553" text-anchor="middle" class="small">跨语言向量 + rekey 规则</text>
+  <text x="1035" y="580" text-anchor="middle" class="small">撤销、重放、失败回滚</text>
+  <text x="600" y="735" text-anchor="middle" font-size="18" fill="#52606d">核心取舍：XX 用半个往返换取零前提与首次配对契合；IK 用可靠公钥绑定换速度与 0-RTT。</text>
+</svg>

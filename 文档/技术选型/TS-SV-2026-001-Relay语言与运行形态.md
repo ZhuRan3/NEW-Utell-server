@@ -21,7 +21,7 @@
 
 - 公网入口 443/TLS/WSS；证书可自动续期。
 - Relay 不持端点私钥，不读取、解密或持久化业务正文；不建立离线业务队列。
-- 一个账号最多一台 active 主 Connector；replacement/撤销必须原子化。
+- 每个 pairing 身份最多绑定一台 active 主 Connector；replacement/撤销必须原子化。
 - 只保存 pairing、设备公钥、撤销、限流和最小脱敏审计元数据；审计留存 14 天（Q-SV-2026-011 已确认）。
 - 必须支持心跳、ACK、序号、背压、限流、消息大小上限和稳定错误码。
 - 首发为单台云主机可承载的轻量部署；不引入 Kubernetes、Redis、Kafka 等重型依赖。

@@ -1,0 +1,93 @@
+profile_version: "0.1.0"
+status: "pending"
+owner: "Zhu3xx"
+canonical_path: "harness/契约/integration-profile.yaml"
+repositories:
+  - "NEW-Utell-phone"
+  - "NEW-Utell-server"
+source_documents:
+  product: "项目总体背景愿景目标/PRD：Utell（油条）第一代智能日志 MVP.md"
+  requirements: "文档/需求对齐/需求确认台账.md"
+  decisions: "文档/需求对齐/需求问答记录.md"
+  governance: "文档/架构与契约/跨端公开契约治理规范.md"
+gates:
+  prd_alignment: "passed"
+  requirements_alignment: "in_progress"
+  technical_stack: "in_progress"
+  e2ee_spike: "completed_pending_connector_acceptance"
+  connector_acceptance: "pending"
+  compatibility_matrix: "pending"
+sections:
+  relay_transport: "pending"
+  pairing_and_identity: "pending"
+  e2ee_handshake_and_vectors: "pending"
+  health_and_ready: "pending"
+  capture_receipt_semantics: "pending"
+  projection_sync: "pending"
+  original_trace: "pending"
+  card_command: "pending"
+  errors_and_close_codes: "pending"
+  limits_and_backpressure: "pending"
+e2ee:
+  pattern: "Noise_XX_25519_ChaChaPoly_SHA256"
+  pattern_status: "confirmed"
+  initiator: "phone"
+  responder: "connector"
+  role_status: "confirmed"
+  static_key_binding: "endpoint_generated_persisted_and_bound_to_pairing_id"
+  static_key_binding_status: "confirmed"
+  relay_private_key_storage: "forbidden"
+  rekey_strategy: "full_noise_handshake_on_session_reconnect_only"
+  rekey_strategy_status: "confirmed"
+  in_session_rekey_control_frame: "forbidden_p0"
+  transport_sequence: "per_direction_monotonic_uint64_per_session"
+  transport_sequence_status: "confirmed"
+  duplicate_or_lower_sequence: "reject"
+  sequence_reset_on_reconnect: true
+  handshake_timeout_strategy: "fixed_total_timeout"
+  handshake_timeout_strategy_status: "confirmed"
+  public_handshake_error: "HANDSHAKE_FAILED"
+  public_handshake_error_status: "confirmed"
+  handshake_detail_exposure: "endpoint_local_diagnostics_only"
+  handshake_timeout_seconds: 10
+  handshake_timeout_value_status: "confirmed_initial_pending_spike_validation"
+  reconnect_backoff: "foreground_immediate_then_exponential_1s_2s_4s_8s_16s_capped_reset_on_success"
+  reconnect_backoff_status: "confirmed_foreground_only"
+  background_connection: "no_persistent_noise_connection_no_continuous_reconnect_resume_on_foreground"
+  background_connection_status: "confirmed"
+  network_recovery_trigger: "resume_only_after_current_backoff_no_counter_reset"
+  network_recovery_trigger_status: "confirmed"
+  network_recovery_debounce_seconds: 1
+  network_recovery_debounce_status: "confirmed_initial_pending_spike_validation"
+  network_type_switch: "close_old_wss_noise_and_reconnect_using_existing_backoff_and_debounce"
+  network_type_switch_status: "confirmed"
+  reconnect_attempts: "unbounded_foreground_with_16s_backoff_cap_paused_in_background"
+  reconnect_attempts_status: "confirmed"
+  pairing_handshake_rate_limit: "per_pairing_id"
+  pairing_handshake_rate_limit_status: "confirmed"
+  pairing_handshake_rate_limit_error: "RATE_LIMITED"
+  pairing_handshake_rate_limit_error_status: "confirmed"
+  pairing_handshake_rate_limit_parameters_status: "pending_capacity_spike"
+  pairing_handshake_rate_limit_window_seconds: 60
+  pairing_handshake_rate_limit_attempts: 5
+  pairing_handshake_rate_limit_initial_status: "confirmed_initial_pending_capacity_spike_validation"
+  global_handshake_protection: "concurrency_and_rate"
+  global_handshake_protection_status: "confirmed"
+  global_handshake_protection_error: "RATE_LIMITED"
+  global_handshake_protection_error_status: "confirmed"
+  global_handshake_protection_parameters_status: "confirmed_initial_pending_capacity_spike_validation"
+  global_handshake_protection_concurrency_limit: 100
+  global_handshake_protection_rate_window_seconds: 60
+  global_handshake_protection_rate_attempts: 300
+  global_handshake_protection_initial_status: "confirmed_initial_pending_capacity_spike_validation"
+  implementation_status: "spike_complete_formal_contract_pending"
+  interoperability_peer: "Rust snow (Connector candidate)"
+  vectors_status: "available_pending_joint_acceptance"
+confirmed_invariants:
+  - "original_trace_request_uses_event_id_only"
+  - "capture_id_and_log_entry_id_are_not_public_mobile_or_relay_fields"
+  - "handshake_failures_are_publicly_mapped_to_HANDSHAKE_FAILED"
+compatibility:
+  byte_identical_across_repositories: true
+  production_implementation_allowed: false
+  internal_connector_apis_allowed: false

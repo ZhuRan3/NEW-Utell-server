@@ -30,9 +30,14 @@
 
 | 文档 | 对应决策/章节 | 内容 |
 |---|---|---|
-| C2-Relay脱敏审计元数据保留决策.html | 需求问答 C2;PRD FR-008 / 7.2 / 9.2 | Relay 脱敏审计元数据是什么、保留期限的学问、30/7/90 天/不保留四选项对比与推荐 |
+| C2-Relay脱敏审计元数据保留决策.html | 需求问答 C2;PRD FR-008 / 7.2 / 9.2 | Relay 脱敏审计元数据是什么、保留期限的学问、30/7/90 天/不保留四选项对比；当前决策为 14 天 |
 | D3a-Relay语言与运行时选型.html | 技术选型 TS-SV-2026-001(D3a) | Relay 语言/运行时三选一:并发模型(goroutine/tokio/事件循环)从零讲懂,Go / Rust / Node 优缺点与部署形态对比,AI 推荐 Go 的证据链与 Spike 空白清单 |
 | D3b-公网TLS-WSS边缘代理.html | 技术选型 TS-SV-2026-001(D3b) | 公网 TLS/WSS 边缘代理从零讲解:Caddy、Nginx、Go autocert 直连的机制、配置、优缺点、reload 长连接风险、联网资料与上线验收流程 |
+| Noise首发Pattern选择/Noise首发Pattern选择.html | D4；跨端 E2EE 契约；Relay 边界 | Noise 在四层链路中的位置、XX 与 IK 的握手机制、扫码/token/指纹绑定、首发建议与冻结前门禁 |
+
+## 子目录
+
+- `Noise首发Pattern选择/`：D4 学习讲义、来源与证据台账、冻结前决策清单、离线 HTML、思维导图/流程图/对比图 SVG。
 
 ## 使用方式
 

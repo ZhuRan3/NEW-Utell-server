@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noise 首发 Pattern 选择 | NEW-Utell 技术栈学习</title>
+<style>
+:root{--ink:#172033;--muted:#52606d;--line:#d9e2ec;--paper:#fff;--wash:#f7fafc;--navy:#16324f;--green:#047857;--blue:#1d4ed8;--amber:#b45309;--red:#b91c1c;--purple:#6d28d9}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:#edf2f7;font:16px/1.75 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif}a{color:#155e75;text-decoration:none;border-bottom:1px solid #9bd1dc}a:hover{color:#0f172a;border-color:#0f172a}code{padding:2px 6px;border-radius:5px;background:#eef2f7;color:#8b1e3f;font:0.95em ui-monospace,SFMono-Regular,Menlo,monospace}main{max-width:1120px;margin:0 auto;background:var(--paper);box-shadow:0 0 40px rgba(15,23,42,.08)}.hero{padding:72px 78px 54px;background:linear-gradient(145deg,#16324f 0%,#214e6b 70%,#0f766e 100%);color:white}.eyebrow{letter-spacing:.12em;text-transform:uppercase;font-size:13px;color:#bae6fd}.hero h1{margin:12px 0 18px;font-size:46px;line-height:1.2;letter-spacing:0}.hero p{max-width:820px;margin:0;color:#dbeafe;font-size:19px}.verdict{margin-top:30px;padding:18px 22px;border-left:5px solid #86efac;background:rgba(255,255,255,.12);font-size:18px}.toc{margin:0;padding:28px 78px;background:#f0fdf4;border-bottom:1px solid #bbf7d0}.toc h2{margin:0 0 8px;font-size:20px}.toc ol{margin:0;padding-left:22px;columns:2}.toc li{margin:5px 0}.content{padding:10px 78px 70px}section{padding-top:50px;scroll-margin-top:18px}h2{margin:0 0 14px;font-size:31px;line-height:1.3;color:var(--navy)}h3{margin:28px 0 8px;font-size:22px;color:#234e70}p{margin:12px 0}ul,ol{padding-left:26px}li{margin:6px 0}.map{border:1px solid var(--line);padding:16px;background:#fbfdff}.map img{display:block;width:100%;height:auto}.figure{margin:24px 0 30px;padding:14px;border:1px solid var(--line);background:#fff}.figure img{display:block;width:100%;height:auto}.figure figcaption{padding:10px 8px 0;color:var(--muted);font-size:14px}.callout{margin:20px 0;padding:17px 20px;border-left:5px solid var(--blue);background:#eff6ff}.callout.green{border-color:var(--green);background:#ecfdf5}.callout.amber{border-color:var(--amber);background:#fffbeb}.callout.red{border-color:var(--red);background:#fef2f2}.callout b{display:block;margin-bottom:4px}.analogy{margin:20px 0;padding:20px 22px;border:1px solid #f8c36a;border-radius:10px;background:#fffaf0}.analogy b{color:#92400e}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{padding:18px;border:1px solid var(--line);background:var(--wash)}.card h3{margin-top:0}.xx{border-top:5px solid var(--green)}.ik{border-top:5px solid var(--blue)}table{width:100%;border-collapse:collapse;margin:18px 0;font-size:15px}th,td{padding:12px 13px;border:1px solid var(--line);vertical-align:top}th{background:var(--navy);color:white;text-align:left}tr:nth-child(even) td{background:#f8fafc}.formula{margin:16px 0;padding:18px 20px;border-radius:8px;background:#111827;color:#e5e7eb;font:15px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap}.sources{font-size:14px;color:var(--muted)}.sources li{margin:8px 0}.footer{padding:28px 78px;background:#102a43;color:#dbeafe}.footer p{margin:4px 0;font-size:14px}@media (max-width:760px){.hero{padding:44px 24px 32px}.hero h1{font-size:34px}.hero p{font-size:17px}.toc,.content,.footer{padding-left:24px;padding-right:24px}.toc ol{columns:1}.grid{grid-template-columns:1fr}h2{font-size:27px}table{display:block;overflow-x:auto;white-space:normal}.figure{padding:7px}}
+</style>
+</head>
+<body>
+<main>
+<header class="hero">
+  <div class="eyebrow">NEW-Utell · D4 · 技术栈学习理解文档库</div>
+  <h1>Noise 首发 Pattern 选择什么？</h1>
+  <p>一份从项目背景、官方规范、实现文档和工程讨论出发的学习讲义：把 <code>XX</code>、<code>IK</code>、扫码配对、一次性 token、指纹核对和跨端冻结放到同一张图上。</p>
+  <div class="verdict"><strong>先给结论：</strong>首发建议 <code>Noise_XX_25519_ChaChaPoly_SHA256</code>。它比 IK 多约半个握手往返，却不要求握手前可靠持有 Connector 静态公钥，能自然接上首次扫码配对。IK 留作“已可信配对后的重连优化”候选，仍需 Spike 和双方确认。</div>
+</header>
+<nav class="toc" aria-label="目录"><h2>阅读地图</h2><ol><li><a href="#overview">先看全貌：问题、位置与结论</a></li><li><a href="#noise">Noise 名字和握手符号</a></li><li><a href="#xx">XX：陌生人三轮互验</a></li><li><a href="#ik">IK：老熟人快速直达</a></li><li><a href="#compare">XX 与 IK 正面对比</a></li><li><a href="#pairing">扫码、token、指纹如何接上</a></li><li><a href="#pipes">为什么首发不直接上 Noise Pipes</a></li><li><a href="#freeze">冻结前门禁与 Spike</a></li><li><a href="#sources">来源与证据</a></li></ol></nav>
+<article class="content">
+<section id="overview"><h2>先看全貌：这到底在解决什么麻烦</h2>
+<p>NEW-Utell 的业务链路是“手机 → Relay → Connector → Utell Pi”。Connector 是业务权威，手机只保留会话内存，Relay 只转发密文。Noise 位于手机和 Connector 两个端点之间：它负责把两端变成一条只有端点能读的应用层加密管道。</p>
+<div class="map"><img src="assets/总览思维导图.svg" alt="Noise 首发 Pattern 选择总览思维导图"><p class="sources">图 1 · 从项目问题分出五条主线：密码套件、XX、IK、配对绑定和冻结门禁。</p></div>
+<div class="analogy"><b>生动例子：三层门。</b>Relay 是只看门牌、不拆信的接线总机；Noise 是手机和电脑各自持有的保险箱锁；二维码和指纹核对是用户确认“我开的确实是这台电脑”。三层各做一件事，不能互相冒充。</div>
+<div class="callout green"><b>这页最重要的一句话</b>Noise 解决“对端是否持有对应私钥、双方如何得到会话密钥”；二维码/token/指纹解决“这把公钥是否属于用户正在配对的那台设备”。</div>
+</section>
+
+<section id="noise"><h2>Noise 名字和握手符号</h2>
+<p><code>Noise_XX_25519_ChaChaPoly_SHA256</code> 是四段式名称：<strong>Noise</strong> 是协议框架，<strong>XX</strong> 是握手 Pattern，<strong>25519</strong> 是 X25519 DH，<strong>ChaChaPoly</strong> 是 ChaCha20-Poly1305 AEAD，<strong>SHA256</strong> 是哈希与密钥派生的搅拌器。</p>
+<table><thead><tr><th>符号</th><th>它做什么</th><th>白话记忆</th></tr></thead><tbody><tr><td><code>e</code></td><td>发送本次会话的临时公钥</td><td>本次见面的临时面具</td></tr><tr><td><code>s</code></td><td>发送设备长期静态公钥</td><td>设备身份证，但不是私钥</td></tr><tr><td><code>ee</code></td><td>临时 × 临时 DH</td><td>两张临时面具碰一下，生成本次秘密</td></tr><tr><td><code>es</code> / <code>se</code></td><td>临时 × 静态 DH</td><td>临时面具和长期身份证交叉验证</td></tr><tr><td><code>ss</code></td><td>静态 × 静态 DH</td><td>两张身份证互碰，确认双方长期身份</td></tr></tbody></table>
+<p>每次 DH 结果会进入滚动的 <code>chaining key</code>。它再派生出当前 AEAD key；因此握手越往后，静态公钥和 payload 越可能已经处于加密保护下。握手结束后双方进入 transport mode，用方向分离的对称密钥加密业务密文。</p>
+<div class="callout amber"><b>这里简化了</b>“8 级/1 级身份隐藏”是 Noise 规范里的相对属性表，不是 NEW-Utell 的隐私评分，也不代表匿名。最终仍要由固定向量、封装和日志审计验证。</div>
+</section>
+
+<section id="xx"><h2>XX：陌生人三轮互验</h2>
+<p>官方脚本：</p><div class="formula">XX:
+  -> e
+  <- e, ee, s, es
+  -> s, se</div>
+<figure class="figure"><img src="assets/XX与IK握手流程.svg" alt="XX 与 IK 握手流程对比图"><figcaption>图 2 · 左侧是 XX：手机先发临时公钥，Connector 回临时公钥并加密发送静态公钥，手机最后加密发送自己的静态公钥。</figcaption></figure>
+<ol><li>手机先发 <code>e</code>，不要求提前知道 Connector 的静态公钥。</li><li>Connector 发 <code>e</code>，双方执行 <code>ee</code>，然后在加密状态里发送 Connector 静态公钥 <code>s</code>，以 <code>es</code> 证明私钥持有。</li><li>手机验证后发送自己的静态公钥 <code>s</code>，以 <code>se</code> 让 Connector 完成反向验证。</li></ol>
+<div class="analogy"><b>生动例子：第一次线下见面。</b>两人各带一张临时名片，先交换临时信息，再在上锁信封里交出长期身份证，最后互相确认。多说一句话，但不需要提前认识。</div>
+<p>Noise 规范的身份隐藏属性表给 XX 的 initiator 记为 8、responder 记为 1。对 NEW-Utell 来说，手机通常是 initiator，身份晚一点出现正好减少移动端身份被旁观者确认的机会。</p>
+</section>
+
+<section id="ik"><h2>IK：老熟人一句暗号就开聊</h2>
+<p>官方脚本：</p><div class="formula">IK:
+  <- s
+  ...
+  -> e, es, s, ss
+  <- e, ee, se</div>
+<p>开头的 <code>&lt;- s</code> 是硬前提：手机在握手开始前已经可靠持有 Connector 的静态公钥。于是第一条消息可以直接做 <code>es</code>、加密发送手机静态公钥、做 <code>ss</code>，甚至带上 0-RTT 的加密 payload；Connector 第二条消息补齐 <code>ee</code> 和 <code>se</code>。</p>
+<div class="analogy"><b>生动例子：通讯录里的老熟人。</b>手机通讯录已经存着 Connector 的长期号码，第一句暗号就能加密说话，速度快，还能顺便交代第一件事。前提是通讯录里的号码必须来自上次可信见面，不能是中间人塞进去的。</div>
+<div class="callout red"><b>IK 最容易被误解的地方</b>“手机拿到了 Connector 公钥”不等于“手机拿到了真实 Connector 公钥”。如果这把钥匙来源只被 Relay 或未经核对的二维码控制，IK 会非常快地建立一条给错误对象的自洽会话。指纹核对、签名绑定或此前可信配对仍不可省。</div>
+</section>
+
+<section id="compare"><h2>XX 与 IK：快与前提的经典交换</h2>
+<figure class="figure"><img src="assets/对比矩阵.svg" alt="XX 与 IK 六维决策对比矩阵"><figcaption>图 3 · 取舍集中在一个问题：愿不愿意把“可靠持有对端静态公钥”前置成开场硬门槛。</figcaption></figure>
+<table><thead><tr><th>维度</th><th>XX</th><th>IK</th></tr></thead><tbody><tr><td>消息 / 往返</td><td>3 条，1.5 RTT</td><td>2 条，1 RTT；可 0-RTT payload</td></tr><tr><td>开场前提</td><td>不要求预先知道对端静态公钥</td><td>initiator 必须可靠持有 responder 静态公钥</td></tr><tr><td>身份出现</td><td>双方在握手中交换；initiator 更晚发送</td><td>initiator 静态身份第一条就发送；responder 公钥是前置知识</td></tr><tr><td>扫码/token 相性</td><td>授权 → 握手交换 → 指纹确认，顺序自然</td><td>需要先解释“公钥如何可信到达手机”</td></tr><tr><td>工程复杂度</td><td>单一脚本，向量和失败分支较少</td><td>若扩展 Pipes，要处理 IK、XXfallback、协议名和试解密</td></tr><tr><td>NEW-Utell 首发</td><td><strong>推荐基线</strong></td><td>未来已配对重连优化候选</td></tr></tbody></table>
+<div class="callout green"><b>建议判定</b>首发的业务消息必须等握手完成和 Connector 身份确认后再发送；因此 IK 的 0-RTT 优势不会直接转化成 P0 业务体验。先用 XX 换取更简单的跨端正确性和配对语义。</div>
+</section>
+
+<section id="pairing"><h2>扫码、一次性 token、指纹和 Noise 如何接上</h2>
+<figure class="figure"><img src="assets/首发冻结决策路线.svg" alt="NEW-Utell Noise 首发冻结决策路线"><figcaption>图 4 · 推荐首发路线：先完成一次性授权，再跑 XX，最后完成指纹绑定并进入 transport。</figcaption></figure>
+<ol><li>Connector 首启生成静态密钥对并安全保存，展示二维码。</li><li>手机扫码，读取 Relay 地址、Connector 名称、指纹和一次性 token；token 建议 5 分钟有效且仅使用一次。</li><li>手机作为 initiator 发起 <code>Noise_XX_25519_ChaChaPoly_SHA256</code>。</li><li>双方在 XX 消息中交换静态公钥并完成私钥持有证明。</li><li>手机和 Connector 展示同一静态公钥指纹；用户核对后才把 pairing 绑定为有效。</li><li>握手完成进入 transport。Relay 只转发密文，不持有端点解密钥匙。</li></ol>
+<p><strong>两层身份确认：</strong>Noise 的 <code>es/se/ss</code> 是密码学确认；用户核对指纹是产品信任确认。两层都通过，手机才能把状态提升为 <code>READY</code>。</p>
+</section>
+
+<section id="pipes"><h2>为什么首发不直接把 IK 和 Noise Pipes 一起塞进来</h2>
+<p>Noise 官方定义了 Pipes：首次用 XX，缓存 responder 静态公钥后用 IK 做快速握手；公钥失效时再切到 <code>XXfallback</code>。这条路线可作为未来演进，但首发实现它会增加模式协商、协议名、fallback 角色、试解密和公钥轮换分支。</p>
+<p>libp2p 的公开 Issue #246 记录了一个关键坑：普通 <code>XX</code> 与 <code>XXfallback</code> 是不同协议名，协议名参与握手 hash；一端用 XX、另一端用 XXfallback，双方可能无法解密。Issue #249 进一步记录了工程团队的取舍：IK 实际收益可能只有半个 RTT，而 Pipes 的复杂度和跨实现兼容负担并不划算，第一版最终只保留 XX。</p>
+<div class="callout amber"><b>取舍</b>首发冻结 XX，牺牲约半个握手往返，换取更清晰的信任链、更少的协商/回退分支和更容易审计的跨语言向量。只有真机 P95 数据证明握手延迟是 P0 瓶颈时，才值得重新评估 IK/Pipes。</div>
+<p>WireGuard 是 IK 的真实生产例子，但它在配置阶段已经可靠分发对端公钥；这个前提与 NEW-Utell 的首次扫码配对不是同一个问题。不能把 WireGuard 的 Pattern 直接搬成产品结论。</p>
+</section>
+
+<section id="freeze"><h2>进入技术栈冻结前，必须关掉哪些门</h2>
+<p><code>Noise_XX_25519_ChaChaPoly_SHA256</code> 只是建议起点。Phone 和 Connector 必须共同冻结以下公开契约：</p>
+<table><thead><tr><th>冻结项</th><th>要写清楚的内容</th></tr></thead><tbody><tr><td>角色与协议名</td><td>手机固定 initiator、Connector 固定 responder；完整协议名逐字节一致。</td></tr><tr><td>静态密钥</td><td>生成、Keychain/Connector 存储、轮换、撤销、指纹格式和展示。</td></tr><tr><td>token</td><td>有效期、一次性消费、重放拒绝、与 pairing 的绑定字段。</td></tr><tr><td>prologue</td><td>是否使用、具体字节串、版本策略；禁止把未认证可变数据误放进去。</td></tr><tr><td>transport</td><td>nonce/counter、方向键、最大消息、错误分类、关闭语义。</td></tr><tr><td>rekey</td><td>触发条件、双方同步信号、失败后重建握手；Noise 规范把它留给应用决定。</td></tr><tr><td>测试向量</td><td>每条握手消息、hash、transport 密文、错误样本；不进入私钥和业务原文。</td></tr></tbody></table>
+<div class="callout red"><b>当前项目的门禁状态</b>两端 `integration-profile.yaml` 仍为 <code>pending</code>；Phone/Rust snow 本机 Noise Spike 原始结果已记录，Connector 共同验收和正式契约仍待完成。本文不自动修改契约状态，也不把建议写成已批准实现。</div>
+<h3>最小 Spike 验收</h3><ul><li>Swift 候选库支持目标套件和 XX，不自研密码原语。</li><li>与 Rust <code>snow</code> 对同一固定输入产生一致消息、握手 hash 和 transport 密文。</li><li>iOS 17 target 编译通过，许可证满足项目要求。</li><li>过期/已用 token、重放、篡改、指纹不符、公钥轮换均拒绝建链。</li><li>日志与 fixture 不出现私钥或业务原文。</li></ul>
+</section>
+
+<section id="sources"><h2>来源与证据</h2>
+<p>以下来源已联网检索并保存于同目录 `来源与证据台账.md`；页面只摘录与本决策直接相关的事实。</p>
+<ul class="sources"><li><a href="https://noiseprotocol.org/noise.html">Noise Protocol Framework 官方规范</a>：Pattern、握手符号、身份隐藏、0-RTT、Noise Pipes、rekey。</li><li><a href="https://www.wireguard.com/protocol/">WireGuard Protocol 官方文档</a>：真实使用 IK 的配置前提与两消息握手。</li><li><a href="https://github.com/mcginty/snow">Rust snow</a>：Rust 参照实现、支持的原语、fallback 未实现提示。</li><li><a href="https://github.com/swift-libp2p/swift-noise">Swift Noise</a>：Swift API 的 XX/IK 和目标密码套件示例。</li><li><a href="https://github.com/libp2p/specs/issues/246">libp2p Issue #246</a>：XXfallback 协议名/hash 和兼容性陷阱。</li><li><a href="https://github.com/libp2p/specs/issues/249">libp2p Issue #249</a>：为复杂度与实际收益最终只保留 XX 的工程讨论。</li></ul>
+</section>
+
+<section><h2>书级回顾</h2><p>Noise 是用握手脚本组织 DH、再进入 AEAD transport 的协议框架。XX 让双方首次见面时现场交换静态身份，代价是 3 条消息、1.5 RTT；IK 依赖 initiator 预先可靠持有 responder 静态公钥，代价前置、速度更快。NEW-Utell 的扫码、一次性 token 和指纹核对天然更贴近 XX，因此首发建议冻结 <code>Noise_XX_25519_ChaChaPoly_SHA256</code>，把 IK/Noise Pipes 留作已配对重连的后续 Spike。</p><div class="callout">值得深挖：Swift 与 Rust 的真实向量、公钥轮换与撤销、prologue 绑定、transport rekey、以及真机条件下 IK 是否真的值得。</div></section>
+</article>
+<footer class="footer"><p>文档状态：学习讲义与决策建议，非已批准跨端契约。</p><p>对应项目：NEW-Utell-phone / NEW-Utell-server · 更新时间：2026-08-24</p></footer>
+</main>
+</body>
+</html>

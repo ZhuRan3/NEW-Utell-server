@@ -47,7 +47,7 @@ code{padding:1px 6px;border-radius:5px;color:#0f172a;background:#eef2f7;font:13.
 <tr><td><b>Caddy</b></td><td>一个轻量前台同时做自动 HTTPS 和原生 WebSocket 反代。</td><td>默认配置卸载会关闭旧 WebSocket；需要客户端重连和低频/有窗口的 reload 运维。</td></tr>
 <tr><td><b>Nginx</b></td><td>成熟的通用反向代理；WebSocket 和证书工具分别配置。</td><td>要手工转发升级头、调长连接超时，并把 certbot/acme.sh 与 reload 串起来。</td></tr>
 <tr><td><b>Go 直连</b></td><td>Go 进程自己监听 443，用 <code>autocert</code> 申请和续期证书。</td><td>没有前置代理可替你承担 WAF、配置分发、证书缓存和边界策略；代码进程重启仍会断线。</td></tr></table>
-<div class="note caution"><div class="title">取舍</div>本库沿用项目中“Go + Caddy”作为暂定评估方向，但仓库规则要求在用户批准前保持“待确认”。D3b 的结论是工程建议，不是已写入架构基线的事实。</div>
+<div class="note caution"><div class="title">取舍</div>“Go + Caddy”已于 2026-08-23 获开发者批准并写入架构基线；本文仍是选型分析快照，Caddy reload 对长连接的影响必须通过 Spike 验证。</div>
 <p><b>边界：</b>本文不选择手机/Connector 的端到端加密协议，不设计 Relay 的业务路由契约，也不比较云厂商负载均衡；只回答“谁站在公网门口终止 TLS 并把 WSS 交给 Relay”。</p>
 </section>
 

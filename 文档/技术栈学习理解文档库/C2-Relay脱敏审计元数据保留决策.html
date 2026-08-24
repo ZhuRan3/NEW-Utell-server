@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>C2 决策点学习文档 · Relay 脱敏审计元数据的 30 天保留</title>
+<title>C2 决策分析快照 · Relay 脱敏审计元数据（当前 14 天）</title>
 <style>
   :root {
     --ink: #1a1a2e; --grey: #6b7280; --blue: #2563eb; --green: #059669;
@@ -91,8 +91,9 @@
 
 <header class="book">
   <div class="tag">NEW-Utell · 技术栈学习理解文档库 · 需求问答 C2</div>
-  <h1>Relay 脱敏审计元数据「最长保留 30 天」——这个决策到底在决定什么？</h1>
-  <p>对应 PRD：FR-008 Relay 服务 · 7.2 Relay 保留规则 · 9.2 发布验收清单（隐私合规）｜需求确认台账条目：C2（待确认）</p>
+  <h1>Relay 脱敏审计元数据——当前决策为最长保留 14 天</h1>
+  <p>对应 PRD：FR-008 Relay 服务 · 7.2 Relay 保留规则 · 9.2 发布验收清单（隐私合规）｜需求确认台账条目：C2（已确认：14 天）</p>
+  <p class="note caution">本文下文的 30 天、7 天、90 天比较是 C2 确认前的历史候选分析；当前产品基线已冻结为 14 天，发布前仍需完成适用法规审查。</p>
 </header>
 
 <nav class="toc">
@@ -116,7 +117,7 @@
 
   <h3>1.1 这个决策的根本张力</h3>
   <p>Utell 的隐私架构有一条铁律（PRD 7.3）：<strong>业务内容端到端加密，Relay 服务器永远读不到用户写了什么</strong>。但 Relay 作为消息的中转站，又必须回答一个工程上绕不开的问题——<strong>当用户抱怨「我发的日志没同步到电脑」时，工程师拿什么去查？</strong></p>
-  <p>答案就是「审计元数据」：Relay 不记内容，但记「信封外面能看到的东西」。C2 这个决策点要回答的是：<strong>这些痕迹留多久？</strong>PRD 7.2 的草案写的是「最长保留 30 天，待确认」，C2 就是要你把这个「待确认」变成「已确认」。</p>
+  <p>答案就是「审计元数据」：Relay 不记内容，但记「信封外面能看到的东西」。C2 这个决策点回答的是：<strong>这些痕迹留多久？</strong>历史草案曾写「最长保留 30 天，待确认」；2026-08-23 已确认当前 PRD 采用最长 14 天并自动删除。</p>
 
   <figure>
     <img src="assets/fig1-architecture.png" alt="Utell 链路结构图：Relay 的视野">
