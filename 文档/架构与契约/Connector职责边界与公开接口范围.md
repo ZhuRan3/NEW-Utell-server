@@ -3,7 +3,7 @@
 > **状态：草案(pending),2026-08-27 起草,待逐项 Q&A 确认**
 > 适用范围：NEW-Utell-phone、NEW-Utell-server,以及消费 `integration-profile` 的 Connector 工程。
 > 依据真源:PRD v0.5、两端需求确认台账(A1–A7、B1–B8、D4)、`harness/契约/integration-profile.yaml`(0.1.0)、架构基线。
-> 确认口径：本文只**归并**已确认语义，不设默认值；凡"待确认"条目须按 `开发规则规范/01-需求对齐与Q&A规范.md` 一次一问走 Q&A 后回写。Owner 未指定，本文按中立口径起草，签署段落留待确认。
+> 确认口径：本文只**归并**已确认语义，不设默认值；凡"待确认"条目须按 `开发规则规范/01-需求对齐与Q&A规范.md` 一次一问走 Q&A 后回写。Owner:Zhu3xx(2026-08-27 用户确认,Q-PH/SV-2026-038),本文作为自建 Connector 工程的需求基线。
 > 粒度约定(2026-08-27 用户拍板):**最小公开面**——只覆盖 Relay↔Connector 传输契约与 Connector 对手机/Relay 公开的服务接口;Pi 内部、Connector 内部数据库 Schema、文件路径、安装运维实现细节**不属于**本文与公开契约。
 
 ## 1. 定位
@@ -118,8 +118,8 @@ Connector 是四层链路(手机 ↔ Relay ↔ PC Connector ↔ Utell Pi)中的*
 
 | # | 待确认项 | 当前口径 | 建议 Q&A |
 | --- | --- | --- | --- |
-| 1 | Connector Owner 归属 | 未定(Painfox 候选) | 待提问 |
-| 2 | Noise 固定向量与失败语义的共同签收 | 单向已完成 Spike | 依赖 #1 |
+| 1 | Connector Owner 归属 | **已确认:Zhu3xx**(Q-PH/SV-2026-038,2026-08-27) | 已关闭 |
+| 2 | Noise 固定向量与失败语义的共同签收 | 单向已完成 Spike;Owner=Zhu3xx,签收在 Connector 侧实现/验收时执行 | 待 Connector 工程 |
 | 3 | 正式封套字段位置、乱序窗口、错误映射 | 仅序号规则已确认 | 待提问 |
 | 4 | Connector Service 正式版本号与能力集编码 | 未定义 | 待提问 |
 | 5 | 桌面首发兼容矩阵(系统版本/打包格式) | PRD 8.3 待指定 | 待提问 |
@@ -140,3 +140,4 @@ Connector 是四层链路(手机 ↔ Relay ↔ PC Connector ↔ Utell Pi)中的*
 | 日期 | 版本 | 变更内容 | 确认人 |
 | --- | --- | --- | --- |
 | 2026-08-27 | v0.1 | 首版草案:归并 PRD v0.5 与台账已确认语义,划定最小公开面,列出 9 项待确认清单。 | 待确认 |
+| 2026-08-27 | v0.2 | 待确认清单 #1 关闭:Connector Owner 确认为 Zhu3xx(Q-PH/SV-2026-038)。 | Zhu3xx |
