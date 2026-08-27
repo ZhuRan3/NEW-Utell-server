@@ -1,0 +1,23 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "connector_offline_no_queue",
+  "contains_business_data": false,
+  "cases": [
+    {
+      "name": "connector_offline",
+      "connector_online": false,
+      "route_attempted": true,
+      "offline_business_queue_created": false,
+      "business_payload_persisted_by_relay": false,
+      "expected_route_error": "ROUTE_NOT_DELIVERED"
+    },
+    {
+      "name": "connector_online",
+      "connector_online": true,
+      "route_attempted": true,
+      "offline_business_queue_created": false,
+      "business_payload_persisted_by_relay": false,
+      "expected_route_error": null
+    }
+  ]
+}

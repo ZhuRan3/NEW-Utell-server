@@ -1,0 +1,38 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "envelope_replay_tamper_expiry",
+  "contains_business_data": false,
+  "public_error_mapping_frozen": false,
+  "cases": [
+    {
+      "name": "duplicate_sequence_replay",
+      "sequence_relation": "duplicate",
+      "integrity_valid": true,
+      "expired": false,
+      "envelope_rejected": true,
+      "route_allowed": false,
+      "business_payload_persisted_by_relay": false,
+      "public_error_code": null
+    },
+    {
+      "name": "invalid_integrity_tamper",
+      "sequence_relation": "fresh",
+      "integrity_valid": false,
+      "expired": false,
+      "envelope_rejected": true,
+      "route_allowed": false,
+      "business_payload_persisted_by_relay": false,
+      "public_error_code": null
+    },
+    {
+      "name": "expired_envelope",
+      "sequence_relation": "fresh",
+      "integrity_valid": true,
+      "expired": true,
+      "envelope_rejected": true,
+      "route_allowed": false,
+      "business_payload_persisted_by_relay": false,
+      "public_error_code": null
+    }
+  ]
+}

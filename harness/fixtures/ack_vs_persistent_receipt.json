@@ -1,0 +1,23 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "ack_vs_persistent_receipt",
+  "contains_business_data": false,
+  "cases": [
+    {
+      "name": "relay_ack_only",
+      "relay_ack_observed": true,
+      "connector_persistent_receipt_observed": false,
+      "expected_phone_state": "UNKNOWN_RESULT",
+      "forbidden_phone_states": ["RECEIVED", "COMMITTED", "PROJECTED"],
+      "relay_ack_semantics": "route_layer_observation_only"
+    },
+    {
+      "name": "connector_persistent_receipt",
+      "relay_ack_observed": true,
+      "connector_persistent_receipt_observed": true,
+      "expected_phone_state": "RECEIVED",
+      "forbidden_phone_states": ["UNKNOWN_RESULT", "COMMITTED", "PROJECTED"],
+      "relay_ack_semantics": "route_layer_observation_only"
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+version: "0.1"
+status: "planned"
+contract_profile: "integration-profile.pending"
+scenario_format: "Given/When/Then with Relay-visible metadata, persistence side effects and endpoint result"
+scenarios:
+  - id: "SC-SV-2026-001"
+    key: "pairing_expired_or_replayed"
+    status: "ready"
+    requires: ["pairing_and_identity", "errors_and_close_codes"]
+    fixture: "harness/fixtures/pairing_expired_or_replayed.json"
+    runner: "harness/scripts/verify_pairing_expired_or_replayed.rb"
+  - id: "SC-SV-2026-002"
+    key: "primary_connector_only"
+    status: "ready"
+    requires: ["pairing_and_identity", "relay_transport"]
+    fixture: "harness/fixtures/primary_connector_only.json"
+    runner: "harness/scripts/verify_primary_connector_only_semantics.rb"
+  - id: "SC-SV-2026-003"
+    key: "revocation"
+    status: "ready"
+    requires: ["pairing_and_identity", "errors_and_close_codes"]
+    fixture: "harness/fixtures/revocation.json"
+    runner: "harness/scripts/verify_revocation_semantics.rb"
+  - id: "SC-SV-2026-004"
+    key: "ack_vs_connector_receipt"
+    status: "ready"
+    requires: ["capture_receipt_semantics", "relay_transport"]
+    fixture: "harness/fixtures/ack_vs_persistent_receipt.json"
+    runner: "harness/scripts/verify_ack_receipt_semantics.rb"
+  - id: "SC-SV-2026-005"
+    key: "connector_offline_no_queue"
+    status: "ready"
+    requires: ["capture_receipt_semantics", "relay_transport"]
+    fixture: "harness/fixtures/connector_offline_no_queue.json"
+    runner: "harness/scripts/verify_connector_offline_no_queue.rb"
+  - id: "SC-SV-2026-006"
+    key: "envelope_replay_tamper_expiry"
+    status: "ready"
+    requires: ["relay_transport", "errors_and_close_codes"]
+    fixture: "harness/fixtures/envelope_replay_tamper_expiry.json"
+    runner: "harness/scripts/verify_envelope_replay_tamper_expiry_semantics.rb"
+  - id: "SC-SV-2026-007"
+    key: "rate_limit_and_size"
+    status: "planned"
+    requires: ["limits_and_backpressure", "errors_and_close_codes"]
+  - id: "SC-SV-2026-008"
+    key: "relay_restart"
+    status: "planned"
+    requires: ["relay_transport", "health_and_ready"]
+  - id: "SC-SV-2026-009"
+    key: "relay_cannot_decrypt"
+    status: "planned"
+    requires: ["relay_transport"]

@@ -1,0 +1,29 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "revocation",
+  "contains_business_data": false,
+  "cases": [
+    {
+      "name": "route_after_confirmed_revocation",
+      "pairing_revocation_confirmed": true,
+      "route_attempted": true,
+      "handshake_attempted": false,
+      "expected_error": "PAIRING_INVALID",
+      "route_allowed": false,
+      "session_established": false,
+      "connector_authority_history_deleted": false,
+      "business_payload_persisted_by_relay": false
+    },
+    {
+      "name": "reconnect_after_confirmed_revocation",
+      "pairing_revocation_confirmed": true,
+      "route_attempted": false,
+      "handshake_attempted": true,
+      "expected_error": "PAIRING_INVALID",
+      "route_allowed": false,
+      "session_established": false,
+      "connector_authority_history_deleted": false,
+      "business_payload_persisted_by_relay": false
+    }
+  ]
+}

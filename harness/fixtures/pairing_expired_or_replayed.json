@@ -1,0 +1,31 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "pairing_expired_or_replayed",
+  "contains_business_data": false,
+  "cases": [
+    {
+      "name": "expired_token",
+      "pairing_attempted": true,
+      "token_expired": true,
+      "token_already_used": false,
+      "pairing_established": false,
+      "handshake_started": false,
+      "route_allowed": false,
+      "pairing_state_mutated": false,
+      "expected_error": "PAIRING_INVALID",
+      "business_payload_persisted_by_relay": false
+    },
+    {
+      "name": "replayed_token",
+      "pairing_attempted": true,
+      "token_expired": false,
+      "token_already_used": true,
+      "pairing_established": false,
+      "handshake_started": false,
+      "route_allowed": false,
+      "pairing_state_mutated": false,
+      "expected_error": "PAIRING_INVALID",
+      "business_payload_persisted_by_relay": false
+    }
+  ]
+}

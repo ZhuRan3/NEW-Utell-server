@@ -1,0 +1,43 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "primary_connector_only",
+  "contains_business_data": false,
+  "cases": [
+    {
+      "name": "single_primary_allows_route",
+      "active_primary_count_before": 1,
+      "new_connector_pairing_attempted": false,
+      "old_pairing_revoked": false,
+      "replacement_explicitly_requested": false,
+      "new_pairing_established": false,
+      "old_primary_route_allowed": true,
+      "new_connector_route_allowed": false,
+      "active_primary_count_after": 1,
+      "pairing_state_mutated": false
+    },
+    {
+      "name": "second_connector_without_revoke_rejected",
+      "active_primary_count_before": 1,
+      "new_connector_pairing_attempted": true,
+      "old_pairing_revoked": false,
+      "replacement_explicitly_requested": false,
+      "new_pairing_established": false,
+      "old_primary_route_allowed": true,
+      "new_connector_route_allowed": false,
+      "active_primary_count_after": 1,
+      "pairing_state_mutated": false
+    },
+    {
+      "name": "explicit_revoke_then_replace",
+      "active_primary_count_before": 1,
+      "new_connector_pairing_attempted": true,
+      "old_pairing_revoked": true,
+      "replacement_explicitly_requested": true,
+      "new_pairing_established": true,
+      "old_primary_route_allowed": false,
+      "new_connector_route_allowed": true,
+      "active_primary_count_after": 1,
+      "pairing_state_mutated": true
+    }
+  ]
+}
