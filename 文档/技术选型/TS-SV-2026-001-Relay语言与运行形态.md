@@ -52,7 +52,7 @@
 | Node "Don't block the event loop" 文档 | E1 | 单线程事件循环下 CPU 密集操作会阻塞全部连接，需 worker_threads 规避 |
 | Caddy reverse_proxy 文档与社区 issue（#5471/#6420/#7222） | E1 | 原生 WSS 反代 + 自动 HTTPS；默认 `stream_close_delay=0` 时配置卸载关闭旧流，延迟参数只能有限排空，客户端仍需重连 |
 | Nginx WebSocket proxying 文档 | E1 | 功能成熟，需手工 Upgrade 头与自行证书自动化 |
-| 本机工具链审计 | E2 | Rust 1.94.1、Node v24.14.0 已就绪；Go 未安装（需安装工具链） |
+| 本机工具链审计 | E2 | Rust 1.94.1、Node v24.14.0 已就绪；Go 未安装（需安装工具链）〔更新 2026-08-28:Go 1.27.0 已安装并实测可用，SPK-SV-2026-001 本机与 ECS 均以其构建运行，见该 spike 证据〕 |
 
 Noise 生态说明（不计入本决策）：Rust snow 0.10.0 维护活跃；Go flynn/noise 停更约 2.5 年；Node noise-handshake 仅覆盖握手。该事实影响手机端与 Connector 的 E2EE 选型，不影响 Relay。
 
@@ -63,7 +63,7 @@ Noise 生态说明（不计入本决策）：Rust snow 0.10.0 维护活跃；Go 
 | WSS 连接并发模型 | goroutine 连接级并发，适配度高 | tokio async，适配度高 | 事件循环，CPU 密集会阻塞全局 |
 | 单机部署产物 | 纯静态单二进制（全链路可无 cgo） | 单二进制（musl/bundled） | 需 Node 运行时；SEA 实验性 |
 | 核心库稳定性 | 标准库 + 活跃 1.x 库 | Web 栈核心库全部 0.x | ws/better-sqlite3 成熟活跃 |
-| 本机就绪（E2） | 未安装，需装工具链 | 已安装 1.94.1 | 已安装 v24.14.0 |
+| 本机就绪（E2） | 已安装 1.27.0（2026-08-28 更新，SPK-SV-2026-001 已实测） | 已安装 1.94.1 | 已安装 v24.14.0 |
 | 单 Owner 交付成本 | 预计低到中 | 预计高（async/借用检查） | 预计低 |
 | 资源可预测性 | 待 Spike（E3） | 强，待 Spike | 基线内存最高，待 Spike |
 | 最强失败场景 | 库细节未实测；工具链需安装 | 0.x 升级破坏 + 迭代速度税 | 事件循环阻塞、native ABI、无单二进制 |
