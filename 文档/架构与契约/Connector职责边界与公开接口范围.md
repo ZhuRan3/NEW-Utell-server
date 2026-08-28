@@ -64,7 +64,7 @@ Connector 是四层链路(手机 ↔ Relay ↔ PC Connector ↔ Utell Pi)中的*
 
 ### 3.3 健康上报与能力宣告(health_and_ready)
 
-- 每 10 秒上报:Connector 版本/能力集、权威数据库是否可接收、Pi doctor 状态(已确认 C4、FR-003)。
+- 每 10 秒上报:Connector 版本/能力集、权威数据库是否可接收、Pi doctor 状态(已确认 C4、FR-003);版本为双层——service_version(SemVer,人读/诊断)+protocol_version(单调 uint,兼容判定唯一依据),能力集为字符串数组,兼容判定=protocol_version 匹配+手机必需能力⊆Connector 能力集,不满足则上报不兼容(已确认,Q-PH/SV-2026-040)。
 - 上报经 Relay 转达;手机按 30 秒新鲜度判定 READY / NOT_READY_CONNECTOR / NOT_READY_STORAGE / UNKNOWN(PRD 5.2)。
 - 能力不兼容(不在兼容矩阵内)时 Connector 必须上报不兼容,不得进入 READY(PRD 9.1)。
 
@@ -106,7 +106,7 @@ Connector 是四层链路(手机 ↔ Relay ↔ PC Connector ↔ Utell Pi)中的*
 | relay_transport | 是(消费方) | 语义已确认,封套字段待冻结 |
 | pairing_and_identity | 是(被配对方) | 语义已确认(B1/D4),二维码载荷字段待冻结 |
 | e2ee_handshake_and_vectors | 是(Responder) | 参数全确认;**固定向量待共同签收** |
-| health_and_ready | 是(上报方) | 10s/30s 已确认;上报载荷字段待冻结 |
+| health_and_ready | 是(上报方) | 10s/30s 已确认;版本/能力集编码已确认(Q-PH/SV-2026-040);上报载荷字段待冻结 |
 | capture_receipt_semantics | 是(签发方) | 语义已确认并有场景证据(SC-004) |
 | projection_sync | 是(生成方) | 语义已确认并有场景证据(SC-005) |
 | original_trace | 是(响应方) | 语义已确认(A7) |
@@ -121,7 +121,7 @@ Connector 是四层链路(手机 ↔ Relay ↔ PC Connector ↔ Utell Pi)中的*
 | 1 | Connector Owner 归属 | **已确认:Zhu3xx**(Q-PH/SV-2026-038,2026-08-27) | 已关闭 |
 | 2 | Noise 固定向量与失败语义的共同签收 | 单向已完成 Spike;Owner=Zhu3xx,签收在 Connector 侧实现/验收时执行 | 待 Connector 工程 |
 | 3 | 正式封套字段位置、乱序窗口、错误映射 | **已确认**(Q-PH/SV-2026-039,2026-08-28):密文内 8 字节大端前缀、严格单调窗口=0、不新增公开码、P0 不设独立封套 TTL | 已关闭 |
-| 4 | Connector Service 正式版本号与能力集编码 | 未定义 | 待提问 |
+| 4 | Connector Service 正式版本号与能力集编码 | **已确认**(Q-PH/SV-2026-040,2026-08-28):SemVer service_version+单调 uint protocol_version;capabilities 字符串数组+子集判定;矩阵实体化为两端契约 YAML,G3 冻结、运行期本地判定 | 已关闭 |
 | 5 | 桌面首发兼容矩阵(系统版本/打包格式) | PRD 8.3 待指定 | 待提问 |
 | 6 | 权威库静态加密方案 | 必须通过安全评审,方案未定 | 待提问 |
 | 7 | 数据恢复策略(电脑损坏/换机) | PRD 8.3 待指定 | 待提问 |
@@ -142,3 +142,4 @@ Connector 是四层链路(手机 ↔ Relay ↔ PC Connector ↔ Utell Pi)中的*
 | 2026-08-27 | v0.1 | 首版草案:归并 PRD v0.5 与台账已确认语义,划定最小公开面,列出 9 项待确认清单。 | 待确认 |
 | 2026-08-27 | v0.2 | 待确认清单 #1 关闭:Connector Owner 确认为 Zhu3xx(Q-PH/SV-2026-038)。 | Zhu3xx |
 | 2026-08-28 | v0.3 | 待确认清单 #3 关闭:正式封套字段位置(密文内 8 字节大端前缀)/乱序窗口(严格单调=0)/错误映射(不新增公开码)确认(Q-PH/SV-2026-039)。 | Zhu3xx |
+| 2026-08-28 | v0.4 | 待确认清单 #4 关闭:版本号双层形态/能力集编码/兼容矩阵载体确认(Q-PH/SV-2026-040)。 | Zhu3xx |
