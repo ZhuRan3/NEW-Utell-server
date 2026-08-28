@@ -1,0 +1,27 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "relay_cannot_decrypt",
+  "contains_business_data": false,
+  "relay_holds_private_keys": false,
+  "e2ee_terminated_at": "endpoints",
+  "cases": [
+    {
+      "name": "routing_payload_is_ciphertext_only",
+      "routed_bytes_are_ciphertext": true,
+      "relay_reads_plaintext": false,
+      "relay_decrypts_payload": false
+    },
+    {
+      "name": "relay_persistence_surface",
+      "persists": ["pairing_metadata", "public_keys", "audit_metadata"],
+      "never_persists": ["business_payload", "private_keys", "plaintext"],
+      "business_payload_persisted_by_relay": false
+    },
+    {
+      "name": "full_compromise_yields_no_plaintext",
+      "assumed_breach": "full relay host and database read access",
+      "plaintext_recoverable": false,
+      "private_keys_recoverable": false
+    }
+  ]
+}

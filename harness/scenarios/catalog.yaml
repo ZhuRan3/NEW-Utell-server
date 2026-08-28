@@ -1,5 +1,5 @@
 version: "0.1"
-status: "planned"
+status: "ready"
 contract_profile: "integration-profile.pending"
 scenario_format: "Given/When/Then with Relay-visible metadata, persistence side effects and endpoint result"
 scenarios:
@@ -41,13 +41,19 @@ scenarios:
     runner: "harness/scripts/verify_envelope_replay_tamper_expiry_semantics.rb"
   - id: "SC-SV-2026-007"
     key: "rate_limit_and_size"
-    status: "planned"
+    status: "ready"
     requires: ["limits_and_backpressure", "errors_and_close_codes"]
+    fixture: "harness/fixtures/rate_limit_and_size.json"
+    runner: "harness/scripts/verify_rate_limit_and_size_semantics.rb"
   - id: "SC-SV-2026-008"
     key: "relay_restart"
-    status: "planned"
+    status: "ready"
     requires: ["relay_transport", "health_and_ready"]
+    fixture: "harness/fixtures/relay_restart.json"
+    runner: "harness/scripts/verify_relay_restart_semantics.rb"
   - id: "SC-SV-2026-009"
     key: "relay_cannot_decrypt"
-    status: "planned"
+    status: "ready"
     requires: ["relay_transport"]
+    fixture: "harness/fixtures/relay_cannot_decrypt.json"
+    runner: "harness/scripts/verify_relay_cannot_decrypt_semantics.rb"

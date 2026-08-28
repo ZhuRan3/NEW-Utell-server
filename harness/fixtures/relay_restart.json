@@ -1,0 +1,35 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "relay_restart",
+  "contains_business_data": false,
+  "cases": [
+    {
+      "name": "restart_preserves_registry",
+      "pairing_registry_preserved": true,
+      "public_keys_preserved": true,
+      "audit_metadata_preserved": true,
+      "audit_retention_days": 14
+    },
+    {
+      "name": "restart_drops_inflight_ciphertext",
+      "inflight_undelivered_recovered": false,
+      "offline_queue_created": false,
+      "business_payload_persisted_by_relay": false,
+      "sender_observes": "RELAY_UNREACHABLE"
+    },
+    {
+      "name": "restart_requires_new_session",
+      "old_sessions_resumed": false,
+      "full_handshake_required": true,
+      "reconnect_attempts": 5,
+      "reconnect_succeeded": 5,
+      "e3_observed": true
+    },
+    {
+      "name": "health_endpoint_recovers",
+      "healthz_status_after_restart": 204,
+      "health_report_interval_seconds": 10,
+      "e3_observed": true
+    }
+  ]
+}

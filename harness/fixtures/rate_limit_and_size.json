@@ -1,0 +1,63 @@
+{
+  "fixture_version": "0.1",
+  "scenario_key": "rate_limit_and_size",
+  "contains_business_data": false,
+  "confirmed_params": {
+    "global_concurrency_limit": 100,
+    "global_rate_limit": 300,
+    "rate_window_seconds": 60,
+    "pairing_rate_limit": 5,
+    "pairing_window_seconds": 60,
+    "limit_error_code": "RATE_LIMITED",
+    "message_size_cap_frozen": false
+  },
+  "cases": [
+    {
+      "name": "global_concurrency_gate_exact",
+      "attempts": 125,
+      "parallel": 125,
+      "accepted": 100,
+      "rate_limited": 25,
+      "other_failures": 0,
+      "error_code": "RATE_LIMITED",
+      "e3_observed": true
+    },
+    {
+      "name": "global_rate_gate_exact",
+      "attempts": 360,
+      "parallel": 1,
+      "accepted": 300,
+      "rate_limited": 60,
+      "other_failures": 0,
+      "error_code": "RATE_LIMITED",
+      "e3_observed": true
+    },
+    {
+      "name": "pairing_rate_gate_exact",
+      "same_pairing_attempts_in_window": 8,
+      "accepted": 5,
+      "rate_limited": 3,
+      "other_failures": 0,
+      "error_code": "RATE_LIMITED",
+      "independent_of_global_layer": true,
+      "e3_observed": true
+    },
+    {
+      "name": "pairing_rate_independence",
+      "distinct_pairings": 6,
+      "attempts_per_pairing": 1,
+      "accepted": 6,
+      "rate_limited": 0,
+      "other_failures": 0,
+      "e3_observed": true
+    },
+    {
+      "name": "message_size_not_frozen",
+      "size_cap_defined": false,
+      "relay_persists_payload": false,
+      "e3_echo_ladder_max_payload_bytes": 1048576,
+      "e3_echo_ladder_p95_ms_max": 19,
+      "note": "ecs.c7.large E3(2026-08-27):1MiB echo p95<19ms;最终大小上限在 G3 契约冻结时确定"
+    }
+  ]
+}
