@@ -1,8 +1,8 @@
 {
-  "fixture_version": "0.1",
+  "fixture_version": "0.2",
   "scenario_key": "envelope_replay_tamper_expiry",
   "contains_business_data": false,
-  "public_error_mapping_frozen": false,
+  "public_error_mapping_frozen": true,
   "cases": [
     {
       "name": "duplicate_sequence_replay",
@@ -34,5 +34,8 @@
       "business_payload_persisted_by_relay": false,
       "public_error_code": null
     }
-  ]
+  ],
+  "public_error_mapping_decision": "Q-PH/SV-2026-039",
+  "sequence_rule": "ciphertext_internal_prefix_uint64_be_strict_monotonic_window_0",
+  "expiry_semantics": "p0_has_no_envelope_ttl; expiry handled via session rebuild; single-session limits tracked in connector checklist #9"
 }
