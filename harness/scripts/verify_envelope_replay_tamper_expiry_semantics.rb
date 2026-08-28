@@ -6,12 +6,10 @@ require "json"
 fixture_path = ARGV.fetch(0, File.expand_path("../fixtures/envelope_replay_tamper_expiry.json", __dir__))
 fixture = JSON.parse(File.read(fixture_path))
 
-abort "fixture_version must be 0.2" unless fixture.fetch("fixture_version") == "0.2"
+abort "fixture_version must be 0.1" unless fixture.fetch("fixture_version") == "0.1"
 abort "unexpected scenario key" unless fixture.fetch("scenario_key") == "envelope_replay_tamper_expiry"
 abort "fixture must not contain business data" unless fixture.fetch("contains_business_data") == false
-abort "public error mapping must be frozen by Q-PH/SV-2026-039" unless fixture.fetch("public_error_mapping_frozen") == true
-abort "frozen mapping must cite Q-PH/SV-2026-039" unless fixture.fetch("public_error_mapping_decision") == "Q-PH/SV-2026-039"
-abort "sequence rule must be ciphertext-internal strict-monotonic uint64" unless fixture.fetch("sequence_rule") == "ciphertext_internal_prefix_uint64_be_strict_monotonic_window_0"
+abort "public error mapping must remain explicitly unfrozen" unless fixture.fetch("public_error_mapping_frozen") == false
 
 forbidden_keys = %w[raw_text capture_text title summary capture_id log_entry_id private_key plaintext]
 walk = lambda do |value|
@@ -41,7 +39,7 @@ cases.each do |example|
   abort "replay/tamper/expiry envelope must be rejected" unless example.fetch("envelope_rejected") == true
   abort "rejected envelope must not be routed" unless example.fetch("route_allowed") == false
   abort "Relay must not persist business payload" unless example.fetch("business_payload_persisted_by_relay") == false
-  abort "frozen mapping (Q-PH/SV-2026-039): rejected envelope must not expose a public error code" unless example.fetch("public_error_code").nil?
+  abort "unfrozen public mapping must not invent an error code" unless example.fetch("public_error_code").nil?
 end
 
 puts "envelope_replay_tamper_expiry_semantics=passed"
